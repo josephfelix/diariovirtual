@@ -1,0 +1,17 @@
+<ion-view view-title="<img src='img/logo.png' />" name="profile-view">
+    <ion-content class="padding" ng-controller="ProfileCtrl" ng-init="init()">
+        <div class="list card">
+            <div class="item item-avatar">
+                <img ng-src="{{profileData.picture.data.url}}">
+                <h2>{{profileData.name}}</h2>
+                <p>{{profileData.id}}</p>
+                <p>{{profileData.email}}</p>
+            </div>
+        </div>
+    <ion-list>
+        <ion-item ng-repeat="friend in friends">
+            {{friend.name}}
+        </ion-item>
+    </ion-list>
+    </ion-content>
+</ion-view>

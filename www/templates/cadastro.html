@@ -1,0 +1,22 @@
+<ion-view view-title="<img src='img/logo.png' />">
+  <ion-content class="padding" ng-controller="CadastroCtrl">
+      <center style="background: black;"><img  src='img/logo.png' /></center>
+      <div class="list list-inset">
+          <label class="item item-input">
+              <input type="text" placeholder="Nome da conta" ng-model="data.username">
+          </label>
+          <label class="item item-input">
+              <input type="text" placeholder="Senha" ng-model="data.password">
+          </label>
+          <label class="item item-input">
+              <input type="text" placeholder="Email" ng-model="data.email">
+          </label>
+        <button ng-click="getphoto()" class="button button-royal" type="button">Escolha Foto</button>
+        <img style="display:none;" id="profileImage" src="" />
+
+      </div>
+
+      <button class="button button-block button-calm" ng-click="enviar()">Enviar</button>
+<br>
+    </ion-content>
+</ion-view>

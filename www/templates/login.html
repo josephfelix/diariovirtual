@@ -1,0 +1,18 @@
+<ion-view view-title="<img src='img/logo.png' />">
+  <ion-content class="padding" ng-controller="LoginCtrl">
+      <center style="background: black;"><img  src='img/logo.png' /></center>
+      <div class="list list-inset">
+          <label class="item item-input">
+              <input type="text" placeholder="Username" ng-model="data.username">
+          </label>
+          <label class="item item-input">
+              <input type="password" placeholder="Password" ng-model="data.password">
+          </label>
+      </div>
+      <button class="button button-block button-calm" ng-click="login()">Login</button>
+<br>
+      <button class="button button-block button-calm" ng-click="loginfb()">Login com Facebook</button>
+<br><br><br>
+      <button class="button button-block button-calm" ng-click="cadastro()">Cadastro</button>
+    </ion-content>
+</ion-view>

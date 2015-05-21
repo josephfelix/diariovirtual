@@ -1,18 +1,19 @@
 <ion-view view-title="<img src='img/logo.png' />">
-	<ion-content>
-		<ion-refresher refreshing-icon="ion-loop"></ion-refresher>
+	<ion-content ng-controller="HomeCtrl">
+		<ion-refresher refreshing-icon="ion-loop" pulling-text="Pull to refresh" on-refresh="doRefresh()"></ion-refresher>
 		<div class="list card">
 			<div class="item item-input item-stacked-label item-icon-right">
 				<span class="input-label">Publicar status</span>
-				<i class="icon placeholder-icon diario-contador">140</i>
-				<input type="text" class="diario-texto-publicar" placeholder="No que est&aacute; pensando?" />
+				<i class="icon placeholder-icon diario-contador">{{ 140 - diariotexto.length}}</i>
+				<input type="text" ng-model="diariotexto" class="diario-texto-publicar" placeholder="No que est&aacute; pensando?" maxlength="140"/>
+                <img style="display:none;" id="dispImage" src="" />
 			</div>
 			<div class="item no-padding">
 				<div class="row">
 					<div class="col">
 						<div class="diario-toggle-home">
 							<label class="toggle toggle-energized middle">
-								<input type="checkbox" checked="checked" />
+								<input type="checkbox" checked="checked" ng-model="diariopublico" />
 								<div class="track">
 									<div class="handle"></div>
 								</div>
@@ -20,8 +21,9 @@
 							P&uacute;blico
 						</div>
 					</div>
+						<button ng-click="getphoto()" class="button button-royal" type="button">Foto</button>
 					<div class="col">
-						<button class="button button-energized pull-right" type="button">Publicar</button>
+						<button ng-click="publish()" class="button button-energized pull-right" type="button">Publicar</button>
 					</div>
 				</div>
 			</div>
