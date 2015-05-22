@@ -3,16 +3,17 @@
       <center style="background: black;"><img  src='img/logo.png' /></center>
       <div class="list list-inset">
           <label class="item item-input">
-              <input type="text" placeholder="Username" ng-model="data.username">
+              <i class="icon ion-person placeholder-icon"></i>
+              <input type="text" placeholder="Conta" ng-model="username">
           </label>
           <label class="item item-input">
-              <input type="password" placeholder="Password" ng-model="data.password">
+              <i class="icon ion-locked placeholder-icon"></i>
+              <input type="password" placeholder="Senha" ng-model="password">
           </label>
-      </div>
       <button class="button button-block button-calm" ng-click="login()">Login</button>
-<br>
-      <button class="button button-block button-calm" ng-click="loginfb()">Login com Facebook</button>
-<br><br><br>
-      <button class="button button-block button-calm" ng-click="cadastro()">Cadastro</button>
+      <button class="button button-block button-calm" ng-click="loginfb()">Entrar com Facebook</button>
+<hr>
+      <button class="button button-block button-calm" ng-click="cadastro()">Cadastre-se agora!</button>
+      </div>
     </ion-content>
 </ion-view>

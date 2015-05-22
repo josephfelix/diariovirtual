@@ -1,5 +1,5 @@
 <ion-view view-title="<img src='img/logo.png' />">
-	<ion-content ng-controller="HomeCtrl">
+	<ion-content ng-controller="HomeCtrl" ng-init="init()">
 		<ion-refresher refreshing-icon="ion-loop" pulling-text="Pull to refresh" on-refresh="doRefresh()"></ion-refresher>
 		<div class="list card">
 			<div class="item item-input item-stacked-label item-icon-right">
@@ -28,18 +28,20 @@
 				</div>
 			</div>
 		</div>
-		<div class="list card">
+        
+      
+<div class="list card" class="row" ng-repeat="post in posts">
 			<div class="item item-avatar">
-				<img src="img/anonimo.jpg">
-				<h2>Joseph F.</h2>
-				<p>22 de abril, 2015</p>
+				<img ng-src="{{post.ownerimg}}">
+				<h2>{{post.ownername}}</h2>
+				<p>{{post.date}}</p>
 			</div>
 
 			<div class="item item-body">
 				<p>
-				  I love Ionic Framework
+                    {{post.texto}}
 				</p>
-				<img src="img/ionic.png">
+				<img ng-src="{{post.img}}">
 			</div>
 
 			<div class="item tabs tabs-secondary tabs-icon-left diario-social-bar">
@@ -59,40 +61,8 @@
 					<span class="diario-numero-destaque">3</span>
 				</a>
 			</div>
-		</div>
-		
-		<div class="list card">
-			<div class="item item-avatar">
-				<img src="img/anonimo.jpg">
-				<h2>Joseph F.</h2>
-				<p>22 de abril, 2015</p>
-			</div>
-
-			<div class="item item-body">
-				<p>
-				  I hate everything
-				</p>
-			</div>
-
-			<div class="item tabs tabs-secondary tabs-icon-left diario-social-bar">
-				<a href="#" class="tab-item">
-					<i class="icon ion-thumbsup"></i>
-					Curtir
-					<span class="diario-numero-destaque">1</span>
-				</a>
-				<a class="tab-item" href="#">
-					<i class="icon ion-chatbox"></i>
-					Comentar
-					<span class="diario-numero-destaque">20</span>
-				</a>
-				<a class="tab-item" href="#">
-					<i class="icon ion-share"></i>
-					Compartilhar
-					<span class="diario-numero-destaque">0</span>
-				</a>
-			</div>
-		</div>
-		
+</div>
+				
 		<div class="list card">
 			<div class="item">
 				<button type="button" class="button button-energized button-block button-large">

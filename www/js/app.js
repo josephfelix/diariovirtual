@@ -29,7 +29,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
       StatusBar.styleDefault();
     }
 
-    if( localStorage.hasOwnProperty("accessToken") === true)
+    if( localStorage.hasOwnProperty("login") === true)
             $location.path("/app/home");
     else
             $location.path ("/login");
@@ -45,9 +45,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
     templateUrl: "templates/login.html"
   })
 
-  .state('cadastro', {
-    url: "/cadastro",
-    templateUrl: "templates/cadastro.html"
+  .state('cadastro1', {
+    url: "/cadastro1",
+    templateUrl: "templates/cadastro1.html"
+  })
+
+  .state('cadastro2', {
+    url: "/cadastro2",
+    templateUrl: "templates/cadastro2.html"
   })
 
   .state('app', {
