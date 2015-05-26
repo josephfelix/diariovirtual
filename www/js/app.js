@@ -9,16 +9,15 @@
 /* global $http: false */
 /* global localStorage: false */
 
-// Ionic Starter App
 
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-// 'starter.controllers' is found in controllers.js
+// Facebook APP_ID e APP_NAME (DiarioVirtual) colocados no plugin
+
+
 angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
 
-.run(function($ionicPlatform, $location) {
+.run(function($ionicPlatform, $location, $ionicPopup) {
   $ionicPlatform.ready(function() {
+      
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins.Keyboard) {
@@ -29,29 +28,35 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
       StatusBar.styleDefault();
     }
 
-    if( localStorage.hasOwnProperty("login") === true)
-            $location.path("/app/home");
-    else
-            $location.path ("/login");
-      
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+//  $ionicConfigProvider.views.maxCache(0);
+  $ionicConfigProvider.navBar.alignTitle("center");
   $stateProvider
 
  .state('login', {
     url: "/login",
+    cache: false,
     templateUrl: "templates/login.html"
+  })
+
+  .state('profile', {
+    url: "/profile",
+    cache: false,
+    templateUrl: "templates/profile.html"
   })
 
   .state('cadastro1', {
     url: "/cadastro1",
+    cache: false,
     templateUrl: "templates/cadastro1.html"
   })
 
   .state('cadastro2', {
     url: "/cadastro2",
+    cache: false,
     templateUrl: "templates/cadastro2.html"
   })
 
@@ -64,6 +69,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
 
   .state('app.home', {
     url: "/home",
+    cache: false,
     views: {
       'menuContent': {
         templateUrl: "templates/home.html"
@@ -125,11 +131,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
     }
   })
   
-  .state('app.profile', {
-    url: "/profile",
+    .state('app.logout', {
+    url: "/logout",
     views: {
       'menuContent': {
-        templateUrl: "templates/profile.html"
+        templateUrl: "templates/logout.html"
       }
     }
   })
@@ -144,5 +150,5 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
   });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/login');
+  $urlRouterProvider.otherwise('/app/home');
 });

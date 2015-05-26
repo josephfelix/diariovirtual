@@ -1,5 +1,6 @@
-<ion-view view-title="<img src='img/logo.png' />" name="profile-view">
+<ion-view align-title="center" view-title="<img src='img/logo.png' />">
 <ion-content class="padding" ng-controller="ProfileCtrl" ng-init="init()">
+      <center style="background: black;"><img  src='img/logo.png' /></center>
 <div class="list list-inset">
     <div class="row" ng-repeat="friend in friends" ng-if="$index % 3 === 0">
         <div class="col col-33" ng-if="$index < friends.length">
@@ -12,15 +13,15 @@
         <div class="col col-33" ng-if="$index + 1 < friends.length">
             <img ng-src="{{friends[$index + 1].src}}" width="100%" />
             <center>
-                <b>{{friends[$index+1].name}}</b><br>
-            <button class="button button-positive" ng-click="add($index)">Adicionar</button>
+                <h5>{{friends[$index + 1].name}}</h5>
+            <button class="button button-positive" ng-click="add($index+1)">Adicionar</button>
             </center>
         </div>
         <div class="col col-33" ng-if="$index + 2 < friends.length">
             <img ng-src="{{friends[$index + 2].src}}" width="100%" />
             <center>
-                <b>{{friends[$index+2].name}}</b><br>
-            <button class="button button-positive" ng-click="add($index)">Adicionar</button>
+                <h5>{{friends[$index + 2].name}}</h5>
+            <button class="button button-positive" ng-click="add($index+2)">Adicionar</button>
             </center>
         </div>
     </div>

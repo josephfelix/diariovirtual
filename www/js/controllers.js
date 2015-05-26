@@ -7,6 +7,8 @@
 /* global Camera: false */
 /* global $http: false */
 /* global localStorage: false */
+/* global facebookConnectPlugin: false */
+
 
 angular.module('starter.controllers', [])
 
@@ -14,29 +16,51 @@ angular.module('starter.controllers', [])
 //  Controller Home
 //  trata pull refresh e getphoto
 //
-.controller ("HomeCtrl", function ($scope, $ionicActionSheet, $rootScope) {
+.controller ("HomeCtrl", function ($scope, $ionicActionSheet, $rootScope, $location) {
 
-    
-    $scope.fonte = [
-        Camera.PictureSourceType.CAMERA,
-        Camera.PictureSourceType.PHOTOLIBRARY
-    ];
-    
     
     $scope.init = function () {
         $scope.posts = [];
         $scope.diariopublico = false;
         $scope.dispImage = document.getElementById('dispImage');
         $scope.temfoto = false;
+        
+        if( localStorage.hasOwnProperty("login") === true) {
+                $rootScope.usuario = localStorage.conta;
+                return;
+        }
+        
+        localStorage.clear();
+        $rootScope.usuario = "";
+        $rootScope.fotousu = "";
+        $location.path("/login");
+
     };
     
-    $scope.publish = function() {        
+    $scope.logout = function () {
+        localStorage.clear();
+        $rootScope.usuario = "";
+        $rootScope.fotousu = "";
+        $location.path ("/login");
+    };
+    
+    $scope.publish = function() {
+        
+        var monName = new Array ("Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set",  "Out", "Nov", "Dez");
+        var hoje = new Date();
+        
         $scope.arg = {};
         $scope.arg.func = "PUBLISH";
+        $scope.arg.conta = $rootScope.usuario;
         $scope.arg.texto = $scope.diariotexto;
         $scope.arg.publico = $scope.diariopublico;
         $scope.arg.foto = $scope.dispImage.src;
         var ret = sendserver ( $scope.arg );
+        
+        if ( ret === false ) {
+            navigator.notification.alert ("Erro na publicação");
+            return;
+        }
         
         var temp = {};
         if ($rootScope.fotousu)
@@ -44,7 +68,9 @@ angular.module('starter.controllers', [])
         else
             temp.ownerimg = "img/anonimo.jpg";
         temp.ownername = $rootScope.usuario;
-        temp.date = (new Date()).toString().split(' ').splice(1,3).join(' ');
+
+        temp.date = hoje.getDate () + " " + monName[hoje.getMonth()]   +  " "  +     hoje.getFullYear ();
+
         temp.texto = $scope.diariotexto;
         if ( $scope.temfoto )
             temp.img = $scope.dispImage.src;
@@ -61,8 +87,6 @@ angular.module('starter.controllers', [])
     };
     
     $scope.doRefresh = function() {
-//        $scope.todos.unshift({name: 'Incoming todo ' + Date.now()})
-
         $scope.$broadcast('scroll.refreshComplete');
         $scope.$apply();
     };
@@ -70,6 +94,12 @@ angular.module('starter.controllers', [])
     
     $scope.getphoto = function() {    
 
+        var fonte = [
+            Camera.PictureSourceType.CAMERA,
+            Camera.PictureSourceType.PHOTOLIBRARY
+        ];
+    
+    
         var hideSheet = $ionicActionSheet.show({
             buttons: [
                 { text: 'Câmera' },
@@ -84,7 +114,7 @@ angular.module('starter.controllers', [])
                 navigator.camera.getPicture(onPhotoSuccess, onFail, { 
                     quality: 50, 
                     destinationType: Camera.DestinationType.DATA_URL, 
-                    sourceType: $scope.fonte[index],
+                    sourceType: fonte[index],
                     mediaType: Camera.MediaType.PICTURE,
                     correctOrientation: true,
                     targetWidth: 150,
@@ -108,6 +138,7 @@ angular.module('starter.controllers', [])
     
     function sendserver (args) {
         navigator.notification.alert (JSON.stringify(args, null, 4));
+        return true;
     }
 
 })
@@ -118,7 +149,17 @@ angular.module('starter.controllers', [])
 //   trata botoes de login, login Facebook e Cadastro
 //
 
-.controller ("LoginCtrl", function ($scope, $cordovaOauth, $http, $location, $rootScope) {
+.controller ("LoginCtrl", function ($scope, $cordovaOauth, $http, $location, $rootScope) {        
+    $scope.init = function () {
+        $scope.username = "";
+        $scope.password = "";
+        
+        if( localStorage.hasOwnProperty("login") === true) {
+                $rootScope.usuario = localStorage.conta;
+                $location.path("/app/home");
+                $scope.$apply();
+        }        
+    };
 
     $scope.login = function () {
         $scope.arg = {};
@@ -130,6 +171,7 @@ angular.module('starter.controllers', [])
 
         if ( ret === true ) {
             localStorage.login = true;
+            localStorage.conta = $scope.username;
             $rootScope.usuario = $scope.username;
             $rootScope.fotousu = "";
             $location.path ("/app/home");
@@ -144,56 +186,68 @@ angular.module('starter.controllers', [])
             $location.path("/cadastro1");
     };
     
-    $scope.loginfb = function() {
-        $rootScope.friends = [];
+    $scope.randomstring = function () {
+        var s= '';
+        var tam = 8;
         
-        $cordovaOauth.facebook("1579417432308760", ["email", "user_friends"]).then(function(result) {
-            localStorage.accessToken = result.access_token;
-            localStorage.login = true;
-            $scope.token = result.access_token;
-            $scope.pegadadosfb();
-    }, function(error) {
-            navigator.notification.alert("Erro ao logar no Facebook");
-        });
+        var randomchar=function(){
+            var n= Math.floor(Math.random()*62);
+            if(n<10) return n; //1-10
+            if(n<36) return String.fromCharCode(n+55); //A-Z
+            return String.fromCharCode(n+61); //a-z
+        };
+        
+        while(tam--) s+= randomchar();
+        return s;
     };
     
-    
+    $scope.loginfb = function() {
+        $rootScope.friends = [];
+
+        facebookConnectPlugin.login (["email", "user_friends"],
+            function (result) {
+                if (result.status === 'connected') {
+                    localStorage.accessToken = result.authResponse.accessToken;
+                    $scope.pegadadosfb();
+                } else
+                    navigator.notification.alert ("Erro ao tentar logar no Facebook");
+            }, function (error) {
+alert (JSON.stringify (error,null,4));
+                navigator.notification.alert ("Erro " + error + " no login do Facebook");                
+            });
+    };
+        
     $scope.pegadadosfb = function() {
-        if( localStorage.hasOwnProperty("accessToken") === true) {
-            $http.get("https://graph.facebook.com/v2.3/me", { params: { access_token: localStorage.accessToken, fields: "id,name,gender,email,picture", format: "json" }}).then(function(result) {
-                $scope.profileData = result.data;
+           facebookConnectPlugin.api("me/?fields=id,name,email,friends",["user_birthday"],
+                function (result) {
 
-                $scope.arg = {};
-                $scope.arg.func = "LOGINFB";
-                $scope.arg.id = $scope.profileData.id;
-                $scope.arg.conta = $scope.profileData.name;
-                $scope.arg.email = $scope.profileData.email;
-                var ret = sendserver ( $scope.arg );
-                
-            }, function(error) {
-                navigator.notification.alert("Erro ao tentar ler profile.");
-            });
-            
-            $http.get("https://graph.facebook.com/v2.3/me/friends", { params: { access_token: localStorage.accessToken, format: "json" }}).then(function(result) {
-                $rootScope.friends = result.data.data;
+                    localStorage.login = true;
+                    localStorage.conta = result.name;
+                    $rootScope.usuario = result.name;
 
-               if ( $rootScope.friends.length === 0 )
-                   $location.path ("/app/home");
-               else {
-                    for(var i = 0; i < $rootScope.friends.length; i++) {
-                        $rootScope.friends[i].src = "https://graph.facebook.com/" + $rootScope.friends[i].id + "/picture";
+                    $scope.arg = {};
+                    $scope.arg.func = "LOGINFB";
+                    $scope.arg.id = result.id;
+                    $scope.arg.conta = result.name;
+                    $scope.arg.senha = $scope.randomstring();
+                    $scope.arg.email = result.email;
+                    var ret = sendserver ( $scope.arg );
+                    
+                    $rootScope.friends = result.friends.data;
+ 
+                    if ( $rootScope.friends.length === 0 )
+                        $location.path ("/app/home");
+                    else {
+                        for(var i=0; i < $rootScope.friends.length; i++) {
+                            $rootScope.friends[i].src = "https://graph.facebook.com/" + $rootScope.friends[i].id + "/picture?type=square";
+                        }
+                        $location.path("/profile");
                     }
-
-                    $location.path("/app/profile");
-                }
-            }, function(error) {
-                navigator.notification.alert("Erro ao tentar ler amigos.");
-            });
-            
-        } else {
-            navigator.notification.alert("Not signed in");
-            $location.path("/login");
-        }
+                    $scope.$apply();
+                }, 
+                function (error) {
+                    navigator.notification.alert ("Erro "+ error + " ao pegar dados do Facebook");
+                });
     };
 
     function sendserver (args) {
@@ -211,17 +265,18 @@ angular.module('starter.controllers', [])
 .controller ("ProfileCtrl", function ($scope, $location, $rootScope) {
         
     $scope.init = function() {
-        $scope.lista = [];
+        $scope.amigosselecionados = [];
     };
     
     $scope.add = function (index) {
-        $scope.lista.push ($rootScope.friends[index]);
+        $scope.amigosselecionados.push ($rootScope.friends[index]);
     };
     
     $scope.envia = function () {
         $scope.arg = {};
         $scope.arg.func = "AMIGOSFB";
-        $scope.arg.lista = $scope.lista;
+        $scope.arg.conta = $scope.username;
+        $scope.arg.amigos = $scope.amigosselecionados;
         var ret = sendserver ( $scope.arg );
 
         $location.path ("/app/home");
@@ -229,6 +284,7 @@ angular.module('starter.controllers', [])
 
     function sendserver (args) {
         navigator.notification.alert (JSON.stringify(args, null, 4));
+        return true;
     }
 
 })
@@ -239,11 +295,13 @@ angular.module('starter.controllers', [])
 //      trata do envio do Cadastro
 //
 .controller ("CadastroCtrl", function ($scope, $http, $location, $ionicActionSheet, $rootScope) {
-    
-    $scope.fonte = [
-        Camera.PictureSourceType.CAMERA,
-        Camera.PictureSourceType.PHOTOLIBRARY
-    ];
+
+    $scope.init = function () {
+        if( localStorage.hasOwnProperty("login") === true) {
+            $rootScope.usuario = localStorage.conta;
+            $location.path("/app/home");
+        }        
+    };
     
     $scope.enviar1 = function() {
         $scope.arg = {};
@@ -253,13 +311,23 @@ angular.module('starter.controllers', [])
         $scope.arg.email = $scope.email;        
         var ret = sendserver ( $scope.arg );
 
-        $scope.escolheufoto = false;
-        $rootScope.usuario = $scope.username;
-        $rootScope.fotousu = "";
-        $location.path ("/cadastro2");
+        if ( ret === true ) {
+            $rootScope.escolheufoto = false;
+            $rootScope.fotousu = "";
+            localStorage.conta = $scope.username;
+            $location.path ("/cadastro2");
+        } else {
+            navigator.notification.alert ("Erro ao tentar criar cadastro");
+        }
     };    
 
     $scope.getphoto = function() {    
+
+        var fonte = [
+            Camera.PictureSourceType.CAMERA,
+            Camera.PictureSourceType.PHOTOLIBRARY
+        ];
+    
 
         var hideSheet = $ionicActionSheet.show({
             buttons: [
@@ -275,7 +343,7 @@ angular.module('starter.controllers', [])
                 navigator.camera.getPicture(onPhotoSuccess, onFail, { 
                     quality: 50, 
                     destinationType: Camera.DestinationType.DATA_URL, 
-                    sourceType: $scope.fonte[index],
+                    sourceType: fonte[index],
                     mediaType: Camera.MediaType.PICTURE,
                     correctOrientation: true,
                     targetWidth: 175,
@@ -288,21 +356,33 @@ angular.module('starter.controllers', [])
     };
 
     $scope.enviar2 = function () {
-        if ( $scope.escolheufoto ) {
-            $rootScope.fotousu = $scope.dispImage.src;
-            
+        if ( $rootScope.escolheufoto ) {
             $scope.arg = {};
+            $scope.arg.conta = localStorage.conta;
             $scope.arg.func = "CADASTRO";
-            $scope.arg.foto = $scope.dispImage.src;
+            $scope.arg.foto = $rootScope.dispImage.src;
             var ret = sendserver ( $scope.arg );
+            
+            if ( ret === false ) {
+                navigator.notification.alert ("Erro ao tentar cadastrar");
+                $location.path ("/cadastro");
+                return;
+            } else
+                $rootScope.fotousu = $rootScope.dispImage.src;                
         }
+            
+        localStorage.login = true;
+        $rootScope.usuario = localStorage.conta;
+                
+        $rootScope.escolheufoto = false;
         $location.path ("/app/home");
+        $scope.$apply();
     };    
 
     function onPhotoSuccess (imageData) {
-        $scope.dispImage = document.getElementById('profileImage');
-        $scope.dispImage.src = "data:image/jpeg;base64," + imageData;
-        $scope.escolheufoto = true;
+        $rootScope.dispImage = document.getElementById('profileImage');
+        $rootScope.dispImage.src = "data:image/jpeg;base64," + imageData;
+        $rootScope.escolheufoto = true;
     }
     
     function onFail () {
@@ -311,5 +391,6 @@ angular.module('starter.controllers', [])
     
     function sendserver (args) {
         navigator.notification.alert (JSON.stringify(args, null, 4));
+        return true;
     }
 });
