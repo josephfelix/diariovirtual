@@ -18,7 +18,7 @@
     <ion-content class="diario-menu">
       <ion-list>
 		<a class="item item-avatar diario-menu-item" href="#/app/perfil">
-			<img src="img/anonimo.jpg" />
+			<img ng-src="{{fotousu}}" />
 			<p>Entrou como</p>
 			<h2>{{usuario}}</h2>
 		</a>
@@ -46,7 +46,8 @@
         <ion-item nav-clear menu-close href="#/app/configuracoes" class="diario-menu-item">
 			<i class="ion-gear-b diario-icon-menu"></i>&nbsp;Configura&ccedil;&otilde;es
 		</ion-item>
-        <ion-item nav-clear menu-close href="#/app/logout" class="diario-menu-item">
+<!--        <ion-item nav-clear menu-close href="#/app/logout" class="diario-menu-item"> -->
+        <ion-item nav-clear menu-close ng-controller="HomeCtrl" ng-click="logout()" class="diario-menu-item">
 			<i class="ion-gear-b diario-icon-menu"></i>&nbsp;Sair
 		</ion-item>
       </ion-list>

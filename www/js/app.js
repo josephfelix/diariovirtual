@@ -8,6 +8,8 @@
 /* global alert: false */
 /* global $http: false */
 /* global localStorage: false */
+/* global ionic: false */
+/* global setTimeout: false */
 
 
 // Facebook APP_ID e APP_NAME (DiarioVirtual) colocados no plugin
@@ -15,10 +17,26 @@
 
 angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
 
-.run(function($ionicPlatform, $location, $ionicPopup) {
+.run(function($ionicPlatform, $location, $ionicPopup, $rootScope) {
   $ionicPlatform.ready(function() {
       
-    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+      $ionicPlatform.registerBackButtonAction(function(e){
+        if ($rootScope.backButtonPressedOnceToExit) {
+            ionic.Platform.exitApp();
+        } else {
+                $rootScope.backButtonPressedOnceToExit = true;
+                window.plugins.toast.showShortCenter(
+                "Tecle novamente o botáo de voltar para sair",function(a){},function(b){}
+                );
+                setTimeout(function(){
+                    $rootScope.backButtonPressedOnceToExit = false;
+                },2000);
+            }
+        e.preventDefault();
+        return false;
+  },101);
+
+      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -29,6 +47,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
     }
 
   });
+    
 })
 
 .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
@@ -131,15 +150,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
     }
   })
   
-    .state('app.logout', {
-    url: "/logout",
-    views: {
-      'menuContent': {
-        templateUrl: "templates/logout.html"
-      }
-    }
-  })
-
   .state('app.configuracoes', {
     url: "/configuracoes",
     views: {
@@ -151,4 +161,40 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/home');
+})
+
+.factory ("AuthService", function ($http, Session) {
+    var authService = {};
+          
+    authService.login = function (credentials) {
+        return $http
+            .post('/login', credentials)
+            .then(function (res) {
+                Session.create(res.data.id, res.data.user.id);
+                return res.data.user;
+            });
+    };
+ 
+    authService.isAuthenticated = function () {
+        return !!Session.userId;
+    };
+})
+
+.service('Session', function () {
+    this.create = function (sessionId, userId) {
+        this.id = sessionId;
+        this.userId = userId;
+    };
+
+    this.destroy = function () {
+        this.id = null;
+        this.userId = null;
+    };
+})
+
+.constant ( "EVENTOS", {
+    loginSuccess: "sucesso-login",
+    loginFailed:  "falha-login",
+    logoutSucess: "sucesso-logout"
 });
+

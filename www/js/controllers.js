@@ -12,25 +12,38 @@
 
 angular.module('starter.controllers', [])
 
+.controller ("AppCtrl", function ($scope) {
+    $scope.currentUser = null;
+ 
+    $scope.setCurrentUser = function (user) {
+        $scope.currentUser = user;
+  };
+})
+
 //
 //  Controller Home
 //  trata pull refresh e getphoto
 //
-.controller ("HomeCtrl", function ($scope, $ionicActionSheet, $rootScope, $location) {
+.controller ("HomeCtrl", function ($scope, $ionicActionSheet, $rootScope, $location, $ionicPopup) {
 
     
     $scope.init = function () {
         $scope.posts = [];
         $scope.diariopublico = false;
-        $scope.dispImage = document.getElementById('dispImage');
-        $scope.temfoto = false;
+        $scope.diariotexto = "";
+        $scope.fotos = [];
         
         if( localStorage.hasOwnProperty("login") === true) {
                 $rootScope.usuario = localStorage.conta;
+                $rootScope.fotousu = localStorage.fotousu;
                 return;
         }
         
-        localStorage.clear();
+//        localStorage.clear();
+localStorage.removeItem ("login");
+localStorage.removeItem ("conta");
+localStorage.removeItem ("fotousu");
+
         $rootScope.usuario = "";
         $rootScope.fotousu = "";
         $location.path("/login");
@@ -38,13 +51,37 @@ angular.module('starter.controllers', [])
     };
     
     $scope.logout = function () {
-        localStorage.clear();
-        $rootScope.usuario = "";
-        $rootScope.fotousu = "";
-        $location.path ("/login");
+
+        var confirmPopup = $ionicPopup.confirm({
+            title: 'Sair de sessão',
+            template: '<center>Confirma logout?</center>'
+        });
+        
+        confirmPopup.then(function(res) {
+            if(res) {
+//        localStorage.clear();
+localStorage.removeItem ("login");
+localStorage.removeItem ("conta");
+localStorage.removeItem ("fotousu");
+                $rootScope.usuario = "";
+                $rootScope.fotousu = "";
+                $location.path ("/login");
+            } else
+                $location.path ("/home");
+        });
     };
     
     $scope.publish = function() {
+        
+            // Não deixa publicar vazio
+        if ($scope.diariotexto === "" && $scope.fotos.length === 0) {
+            $ionicPopup.alert({
+                title: 'Publicação Vazia',
+                template: '<center>Coloque texto ou foto na publicação</center>'
+            });
+            
+            return;
+        }
         
         var monName = new Array ("Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set",  "Out", "Nov", "Dez");
         var hoje = new Date();
@@ -54,7 +91,7 @@ angular.module('starter.controllers', [])
         $scope.arg.conta = $rootScope.usuario;
         $scope.arg.texto = $scope.diariotexto;
         $scope.arg.publico = $scope.diariopublico;
-        $scope.arg.foto = $scope.dispImage.src;
+        $scope.arg.fotos = $scope.fotos;
         var ret = sendserver ( $scope.arg );
         
         if ( ret === false ) {
@@ -72,16 +109,14 @@ angular.module('starter.controllers', [])
         temp.date = hoje.getDate () + " " + monName[hoje.getMonth()]   +  " "  +     hoje.getFullYear ();
 
         temp.texto = $scope.diariotexto;
-        if ( $scope.temfoto )
-            temp.img = $scope.dispImage.src;
-        else
-            temp.img = "";
+        temp.fotos = [];
+        temp.fotos = $scope.fotos;
         temp.publico = $scope.diariopublico;
-        $scope.posts.push (temp);
+        $scope.posts.unshift (temp);
         
         $scope.diariotexto = "";
-        $scope.dispImage.style.display = "none";
-        $scope.temfoto = false;
+        $scope.fotos = [];
+        $scope.diariopublico = false;
         
         $scope.$apply();        
     };
@@ -131,10 +166,22 @@ angular.module('starter.controllers', [])
     }
 
     function onPhotoSuccess (imageData) {
-        $scope.dispImage.style.display = 'block';
-        $scope.dispImage.src = "data:image/jpeg;base64," + imageData;
-        $scope.temfoto = true;
+        $scope.fotos.push ("data:image/jpeg;base64," + imageData);
+        $scope.$apply();
     }
+    
+    $scope.remove = function (index) {
+     var confirmPopup = $ionicPopup.confirm({
+       title: 'Imagem selecionada',
+       template: 'Confirma a remoção da foto'
+     });
+     confirmPopup.then(function(res) {
+       if(res) {
+         $scope.fotos.splice ( index, 1);
+       } 
+     });
+
+    };
     
     function sendserver (args) {
         navigator.notification.alert (JSON.stringify(args, null, 4));
@@ -149,37 +196,60 @@ angular.module('starter.controllers', [])
 //   trata botoes de login, login Facebook e Cadastro
 //
 
-.controller ("LoginCtrl", function ($scope, $cordovaOauth, $http, $location, $rootScope) {        
+.controller ("LoginCtrl", function ($scope, $http, $location, $rootScope, $ionicPopup, AuthService, EVENTOS) {        
     $scope.init = function () {
-        $scope.username = "";
-        $scope.password = "";
+        $scope.credentials = {
+            username: "",
+            password: ""
+        };
         
         if( localStorage.hasOwnProperty("login") === true) {
                 $rootScope.usuario = localStorage.conta;
+                $rootScope.fotousu = localStorage.fotousu;
                 $location.path("/app/home");
                 $scope.$apply();
         }        
     };
 
-    $scope.login = function () {
+    $scope.login = function (form, credentials) {
+        
+        if (!form.$valid) {
+            $ionicPopup.alert({
+                title: 'Erro na entrada',
+                template: '<center>Conta e/ou senha vazia ou inválida</center>'
+            });
+            return;
+        }
+        
+        AuthService.login(credentials).then(function (user) {
+                $rootScope.$broadcast(EVENTOS.loginSuccess);
+                $scope.setCurrentUser(user);
+            }, function () {
+                $rootScope.$broadcast(EVENTOS.loginFailed);
+            });
+  /*        
         $scope.arg = {};
         $scope.arg.func = "LOGIN";
-        $scope.arg.conta = $scope.username;
-        $scope.arg.senha = $scope.password;
+        $scope.arg.conta = $scope.credentials.username;
+        $scope.arg.senha = $scope.credentials.password;
         $scope.arg.id = 0;
-        var ret = sendserver ( $scope.arg );
+        var ret = sendserver ( $scope.arg, 0);
 
         if ( ret === true ) {
+localStorage.removeItem ("firstlogin");
+
             localStorage.login = true;
-            localStorage.conta = $scope.username;
             $rootScope.usuario = $scope.username;
-            $rootScope.fotousu = "";
+            localStorage.conta = $rootScope.usuario;
+            $rootScope.fotousu = "img/anonimo.jpg";
+            localStorage.fotousu = $rootScope.fotousu;
             $location.path ("/app/home");
         } else {
             navigator.notification.alert ("Conta/Senha Inválida");
             $scope.username = "";
             $scope.password = "";
         }
+*/
     };
     
     $scope.cadastro = function () {
@@ -204,36 +274,45 @@ angular.module('starter.controllers', [])
     $scope.loginfb = function() {
         $rootScope.friends = [];
 
-        facebookConnectPlugin.login (["email", "user_friends"],
-            function (result) {
+        facebookConnectPlugin.login (["email", "user_friends"], $scope.loginfbsucesso,
+            function (error) {
+                    // se deu erro, pode ser o access token expired
+                    // tenta de novo então
+                facebookConnectPlugin.login (["email", "user_friends"], $scope.loginfbsucesso,
+                    function (error) {
+                        navigator.notification.alert ("Erro no login do Fabcebook " + JSON.stringify (error,null,4));
+                });
+            });
+    };
+     
+    $scope.loginfbsucesso = function (result) {
                 if (result.status === 'connected') {
                     localStorage.accessToken = result.authResponse.accessToken;
                     $scope.pegadadosfb();
-                } else
-                    navigator.notification.alert ("Erro ao tentar logar no Facebook");
-            }, function (error) {
-alert (JSON.stringify (error,null,4));
-                navigator.notification.alert ("Erro " + error + " no login do Facebook");                
-            });
+                }
     };
         
     $scope.pegadadosfb = function() {
-           facebookConnectPlugin.api("me/?fields=id,name,email,friends",["user_birthday"],
+           facebookConnectPlugin.api("me/?fields=id,name,email,friends",["user_friends"],
                 function (result) {
 
                     localStorage.login = true;
-                    localStorage.conta = result.name;
                     $rootScope.usuario = result.name;
-
+                    localStorage.conta = result.name;
+                    $rootScope.fotousu = "https://graph.facebook.com/"+ result.id + "/picture?type=square";
+                    localStorage.fotousu = $rootScope.fotousu;
+                    $rootScope.friends = [];
+               
                     $scope.arg = {};
                     $scope.arg.func = "LOGINFB";
                     $scope.arg.id = result.id;
                     $scope.arg.conta = result.name;
                     $scope.arg.senha = $scope.randomstring();
                     $scope.arg.email = result.email;
-                    var ret = sendserver ( $scope.arg );
-                    
-                    $rootScope.friends = result.friends.data;
+                    var ret = sendserver ( $scope.arg, 1 );
+                                   
+                    if ( ret === true )   // primeiro login 
+                        $rootScope.friends = result.friends.data;
  
                     if ( $rootScope.friends.length === 0 )
                         $location.path ("/app/home");
@@ -250,8 +329,14 @@ alert (JSON.stringify (error,null,4));
                 });
     };
 
-    function sendserver (args) {
+    function sendserver (args, fb) {
         navigator.notification.alert (JSON.stringify(args, null, 4));
+        if ( fb === 1 ) {
+            if( localStorage.hasOwnProperty("firstlogin") === true)
+                return false;
+        
+            localStorage.firstlogin = true;
+        }
         return true;
     }
 
@@ -294,16 +379,36 @@ alert (JSON.stringify (error,null,4));
 //
 //      trata do envio do Cadastro
 //
-.controller ("CadastroCtrl", function ($scope, $http, $location, $ionicActionSheet, $rootScope) {
+.controller ("CadastroCtrl", function ($scope, $http, $location, $ionicActionSheet, $ionicPopup, $rootScope) {
 
     $scope.init = function () {
         if( localStorage.hasOwnProperty("login") === true) {
             $rootScope.usuario = localStorage.conta;
+            $rootScope.fotousu = localStorage.fotousu;
             $location.path("/app/home");
         }        
     };
     
-    $scope.enviar1 = function() {
+    $scope.enviar1 = function(form) {
+            // undefined se for invalido ou vazio
+        if ($scope.email === undefined) {
+            $ionicPopup.alert({
+                title: 'Erro na entrada',
+                template: '<center>Email vazio ou inválido</center>'
+            });
+            
+            return;
+        }
+            // formulario invalido
+        if (!form.$valid) {
+            $ionicPopup.alert({
+                title: 'Erro na entrada',
+                template: '<center>Conta/senha vazio ou inválido</center>'
+            });
+            
+            return;
+        }
+
         $scope.arg = {};
         $scope.arg.func = "CADASTRO";
         $scope.arg.conta = $scope.username;
@@ -369,9 +474,12 @@ alert (JSON.stringify (error,null,4));
                 return;
             } else
                 $rootScope.fotousu = $rootScope.dispImage.src;                
+        } else {
+            $rootScope.fotousu = "img/anonimo.jpg";
         }
             
         localStorage.login = true;
+        localStorage.fotousu = $rootScope.fotousu;
         $rootScope.usuario = localStorage.conta;
                 
         $rootScope.escolheufoto = false;

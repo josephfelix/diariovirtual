@@ -1,19 +1,25 @@
-<ion-view align-title="center" view-title="<img src='img/logo.png' />">
-  <ion-content class="padding" ng-controller="LoginCtrl" ng-init="init()">
-      <center style="background: black;"><img  src='img/logo.png' /></center>
-      <div class="list list-inset">
-          <label class="item item-input">
-              <i class="icon ion-person placeholder-icon"></i>
-              <input type="text" placeholder="Conta" ng-model="username">
-          </label>
-          <label class="item item-input">
-              <i class="icon ion-locked placeholder-icon"></i>
-              <input type="password" placeholder="Senha" ng-model="password">
-          </label>
-      <button class="button button-block button-calm" ng-click="login()">Login</button>
+<ion-view align-title="center">
+
+<ion-nav-bar class="preto">
+<ion-nav-title><img src='img/logo.png' /></ion-nav-title>
+</ion-nav-bar>
+
+<ion-content class="padding" ng-controller="LoginCtrl" ng-init="init()">
+    <div class="list list-inset">
+        <form name="loginForm" novalidate="" ng-submit="login(loginForm, credentials)">
+            <label class="item item-input">
+                <i class="icon ion-person placeholder-icon"></i>
+                <input type="text" placeholder="Conta" ng-model="credentials.username" required>
+            </label>
+            <label class="item item-input">
+                <i class="icon ion-locked placeholder-icon"></i>
+                <input type="password" placeholder="Senha" ng-model="credentials.password" required>
+            </label>
+            <button class="button button-block button-calm" type="submit">Login</button>
+        </form>
       <button class="button button-block button-calm" ng-click="loginfb()">Entrar com Facebook</button>
 <hr>
       <button class="button button-block button-calm" ng-click="cadastro()">Cadastre-se agora!</button>
-      </div>
-    </ion-content>
+    </div>
+</ion-content>
 </ion-view>

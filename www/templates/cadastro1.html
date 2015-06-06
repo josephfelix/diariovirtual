@@ -1,20 +1,24 @@
-<ion-view align-title="center" view-title="<img src='img/logo.png' />">
+<ion-view align-title="center">
+    <ion-nav-bar class="preto">
+    <ion-nav-title><img src='img/logo.png' /></ion-nav-title>
+    </ion-nav-bar>
   <ion-content class="padding" ng-controller="CadastroCtrl" ng-init="init()">
-      <center style="background: black;"><img  src='img/logo.png' /></center>
       <div class="list list-inset">
+        <form name="CadForm"novalidate="">
           <label class="item item-input">
               <i class="icon ion-person placeholder-icon"></i>
-              <input type="text" placeholder="Nome da conta" ng-model="username">
+              <input type="text" placeholder="Nome da conta" ng-model="username" required>
           </label>
           <label class="item item-input">
               <i class="icon ion-locked placeholder-icon"></i>
-              <input type="text" placeholder="Senha" ng-model="password">
+              <input type="password" placeholder="Senha" ng-model="password" required>
           </label>
           <label class="item item-input">
               <i class="icon ion-email placeholder-icon"></i>
-              <input type="text" placeholder="Email" ng-model="email">
+              <input type="email" placeholder="Email" ng-model="email" required>
           </label>
-      <button class="button button-block button-calm" ng-click="enviar1()">Enviar</button>
+      <button class="button button-block button-calm" ng-click="enviar1(CadForm)"> Enviar</button>
+          </form>
       </div>
     </ion-content>
 </ion-view>

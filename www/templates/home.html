@@ -6,7 +6,22 @@
 				<span class="input-label">Publicar status</span>
 				<i class="icon placeholder-icon diario-contador">{{ 140 - diariotexto.length}}</i>
 				<input type="text" ng-model="diariotexto" class="diario-texto-publicar" placeholder="No que est&aacute; pensando?" maxlength="140"/>
-                <img style="display:none;" id="dispImage" src="" />
+
+ <div class="list list-inset">
+    <div class="row" ng-repeat="foto in fotos track by $index" ng-if="$index % 3 === 0">
+        <div class="col col-33" ng-if="$index < fotos.length">
+            <img ng-src="{{fotos[$index]}}" width="100%" ng-click="remove($index)"/>
+        </div>
+        <div class="col col-33" ng-if="$index + 1 < fotos.length">
+            <img ng-src="{{fotos[$index + 1]}}" width="100%" ng-click="remove($index + 1)"/>
+        </div>
+        <div class="col col-33" ng-if="$index + 2 < fotos.length">
+            <img ng-src="{{fotos[$index + 2]}}" width="100%" ng-click="remove($index + 2)"/>
+        </div>
+    </div>
+</div>
+                
+<!--                <img style="display:none;" id="dispImage" src="" /> -->
 			</div>
 			<div class="item no-padding">
 				<div class="row">
@@ -34,16 +49,30 @@
 			<div class="item item-avatar">
 				<img ng-src="{{post.ownerimg}}">
 				<h2>{{post.ownername}}</h2>
-				<p>{{post.date}}</p>
+				<p>{{post.date}}&nbsp;
+                        <i ng-if="!post.publico" class="ion-locked"></i>
+                </p>
 			</div>
 
 			<div class="item item-body">
 				<p>
                     {{post.texto}}
 				</p>
-				<img ng-src="{{post.img}}">
-			</div>
-
+                <div class="list list-inset">
+                    <div class="row" ng-repeat="x in post.fotos track by $index" ng-if="$index % 3 === 0">
+                        <div class="col col-33" ng-if="$index < post.fotos.length">
+                            <img ng-src="{{post.fotos[$index]}}" width="100%"/>
+                        </div>
+                        <div class="col col-33" ng-if="$index + 1 < post.fotos.length">
+                            <img ng-src="{{post.fotos[$index + 1]}}" width="100%"/>
+                        </div>
+                        <div class="col col-33" ng-if="$index + 2 < post.fotos.length">
+                            <img ng-src="{{post.fotos[$index + 2]}}" width="100%"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+ 
 			<div class="item tabs tabs-secondary tabs-icon-left diario-social-bar">
 				<a href="#" class="tab-item">
 					<i class="icon ion-thumbsup"></i>
