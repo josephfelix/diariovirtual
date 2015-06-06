@@ -1,25 +1,55 @@
 <ion-view align-title="center">
+	<ion-nav-bar class="preto">
+		<ion-nav-title><img src='img/logo.png' /></ion-nav-title>
+	</ion-nav-bar>
 
-<ion-nav-bar class="preto">
-<ion-nav-title><img src='img/logo.png' /></ion-nav-title>
-</ion-nav-bar>
-
-<ion-content class="padding" ng-controller="LoginCtrl" ng-init="init()">
-    <div class="list list-inset">
-        <form name="loginForm" novalidate="" ng-submit="login(loginForm, credentials)">
-            <label class="item item-input">
-                <i class="icon ion-person placeholder-icon"></i>
-                <input type="text" placeholder="Conta" ng-model="credentials.username" required>
-            </label>
-            <label class="item item-input">
-                <i class="icon ion-locked placeholder-icon"></i>
-                <input type="password" placeholder="Senha" ng-model="credentials.password" required>
-            </label>
-            <button class="button button-block button-calm" type="submit">Login</button>
-        </form>
-      <button class="button button-block button-calm" ng-click="loginfb()">Entrar com Facebook</button>
-<hr>
-      <button class="button button-block button-calm" ng-click="cadastro()">Cadastre-se agora!</button>
-    </div>
-</ion-content>
+	<ion-content class="padding" ng-controller="LoginCtrl">
+		<div class="list list-inset">
+			<div class="item item-divider">
+				<h2 align="center">
+					<strong>
+						Informe seus dados<br>abaixo para continuar
+					</strong>
+				</h2>
+			</div>
+			<label class="item item-input">
+				<i class="icon ion-person placeholder-icon"></i>
+				<input type="text" placeholder="E-mail" ng-model="dados.email" required>
+			</label>
+			<label class="item item-input">
+				<i class="icon ion-locked placeholder-icon"></i>
+				<input type="password" placeholder="Senha" ng-model="dados.senha" required>
+			</label>
+			<div class="item item-login-entrar" align="center">
+				<button class="button button-block button-login" type="button" ng-click="login(dados)">
+					<i class="ion-checkmark"></i>&nbsp;Entrar
+				</button>
+			</div>
+			<div class="item item-login-entrar" align="center">
+				<button class="button button-block button-positive ion-social-facebook" ng-click="loginfb()">
+					Entrar com Facebook
+				</button>
+			</div>
+			<div class="item item-login-entrar">
+				<button class="button button-block button-dark ion-plus" ng-click="cadastro()">
+					Cadastre-se agora!
+				</button>
+			</div>
+		</div>
+	</ion-content>
+	<ion-footer-bar align-title="center" class="bar-dark">
+		<div class="row">
+			<div class="col-33">
+				<a href="#/app/privacidade" class="button">
+					<i class="icon ion-chatbubble"></i>
+					Privacidade
+				</a><br />
+			</div>
+			<div class="col-66">
+				<p align="right">2015 &copy; Di&aacute;rioVirtual<br />
+					Todos direitos reservados.
+				</p>
+			</div>
+		</div>
+	</ion-footer-bar>
 </ion-view>

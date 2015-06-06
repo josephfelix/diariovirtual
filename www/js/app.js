@@ -15,7 +15,7 @@
 // Facebook APP_ID e APP_NAME (DiarioVirtual) colocados no plugin
 
 
-angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
+angular.module('diariovirtual', ['ionic', 'diariovirtual.controllers', 'ngCordova'])
 
 .run(function($ionicPlatform, $location, $ionicPopup, $rootScope) {
   $ionicPlatform.ready(function() {
@@ -55,11 +55,18 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
   $ionicConfigProvider.navBar.alignTitle("center");
   $stateProvider
 
- .state('login', {
-    url: "/login",
-    cache: false,
-    templateUrl: "templates/login.html"
+  .state('app', {
+    url: "/app",
+    abstract: true,
+    templateUrl: "templates/menu.html",
+//    controller: 'AppCtrl'
   })
+  
+	.state('login', {
+		url: "/login",
+		cache: false,
+		templateUrl: "templates/login.html"
+	})
 
   .state('profile', {
     url: "/profile",
@@ -77,13 +84,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
     url: "/cadastro2",
     cache: false,
     templateUrl: "templates/cadastro2.html"
-  })
-
-  .state('app', {
-    url: "/app",
-    abstract: true,
-    templateUrl: "templates/menu.html",
-//    controller: 'AppCtrl'
   })
 
   .state('app.home', {
@@ -160,7 +160,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
   });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/home');
+  $urlRouterProvider.otherwise('/app/login');
 })
 
 .factory ("AuthService", function ($http, Session) {

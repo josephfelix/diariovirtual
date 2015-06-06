@@ -3,6 +3,98 @@ ion-content {
 	background-image: url('../img/bg-cadastro.jpg');
 	color: #fff;
 }
+.icon-large
+{
+	font-size: 1.6em;
+	vertical-align: middle;
+}
+.no-margin
+{
+	margin: 0 !important;
+}
+.no-padding
+{
+	padding: 0 !important;
+}
+.no-padding-side
+{
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+}
+.no-border-top
+{
+	border-top: none;
+}
+.no-border-bottom
+{
+	border-bottom: none;
+}
+.auto-margin
+{
+	margin: auto;
+}
+.text-white
+{
+	color: #fff !important;
+}
+.relative
+{
+	position: relative;
+}
+
+.clear-fix
+{
+	clear: both;
+}
+
+.width-100
+{
+	width: 100%;
+}
+
+.color-orange
+{
+	color: orange;
+}
+
+.color-silver
+{
+	color: silver;
+}
+
+.color-bronze
+{
+	color: #644F32;
+}
+
+.color-red
+{
+	color: #DF2926;
+}
+
+.color-white
+{
+	color: white;
+}
+
+.color-yellow
+{
+	color: yellow;
+}
+
+.padding-4
+{
+	padding: 4px;
+}
+
+.height-70
+{
+	max-height: 100%;
+	height: 73%;
+}
+.bar-footer {
+	height: 56px;
+}
 .pull-left {
 	float: left;
 }
@@ -17,6 +109,17 @@ ion-content {
 }
 .no-padding {
 	padding: 0;
+}
+.spinner {
+	stroke: #fff;
+	fill: #fff;
+}
+.loading-container .spinner {
+	vertical-align: middle;
+}
+.loading-container .loading span {
+	font-size: 1.3em;
+	font-weight: bold;
 }
 .diario-icon-menu {
 	font-size: 1.8em;
@@ -84,4 +187,16 @@ ion-content {
 .diario-icone-notification {
 	font-size: 3em !important;
 	color: #E8E8E8;
+}
+.button-diario {
+	width: 90%;
+}
+.button-login, .button-login:hover {
+	background-color: #F0961E;
+	border-color: #F0961E;
+	color: #fff;
+}
+.item-login-entrar {
+	padding-top: 5px;
+	padding-bottom: 5px;
 }

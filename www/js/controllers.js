@@ -1,32 +1,26 @@
-/* global angular: false */
-/* global window: false */
-/* global cordova: false */
-/* global StatusBar: false */
-/* global navigator: false */
-/* global document: false */
-/* global Camera: false */
-/* global $http: false */
-/* global localStorage: false */
-/* global facebookConnectPlugin: false */
+/**
+* ----------------------------------------------------
+*           Diário Virtual 0.1
+*         Desenvolvido por: Moboo
+*-----------------------------------------------------
+*/
 
+angular.module('diariovirtual.controllers', [])
 
-angular.module('starter.controllers', [])
-
-.controller ("AppCtrl", function ($scope) {
-    $scope.currentUser = null;
- 
-    $scope.setCurrentUser = function (user) {
-        $scope.currentUser = user;
-  };
+.controller('AppCtrl', function( $scope )
+{
+	$scope.currentUser = null;
+    $scope.setCurrentUser = function( user )
+	{
+		$scope.currentUser = user;
+	};
 })
 
 //
 //  Controller Home
 //  trata pull refresh e getphoto
 //
-.controller ("HomeCtrl", function ($scope, $ionicActionSheet, $rootScope, $location, $ionicPopup) {
-
-    
+.controller ("HomeCtrl", function ($scope, $ionicActionSheet, $rootScope, $location, $ionicPopup) {	
     $scope.init = function () {
         $scope.posts = [];
         $scope.diariopublico = false;
@@ -126,7 +120,6 @@ localStorage.removeItem ("fotousu");
         $scope.$apply();
     };
 
-    
     $scope.getphoto = function() {    
 
         var fonte = [
@@ -196,64 +189,71 @@ localStorage.removeItem ("fotousu");
 //   trata botoes de login, login Facebook e Cadastro
 //
 
-.controller ("LoginCtrl", function ($scope, $http, $location, $rootScope, $ionicPopup, AuthService, EVENTOS) {        
-    $scope.init = function () {
-        $scope.credentials = {
-            username: "",
-            password: ""
-        };
-        
-        if( localStorage.hasOwnProperty("login") === true) {
-                $rootScope.usuario = localStorage.conta;
-                $rootScope.fotousu = localStorage.fotousu;
-                $location.path("/app/home");
-                $scope.$apply();
-        }        
-    };
+.controller("LoginCtrl", 
+	function(
+		$scope, 
+		$http, 
+		$location, 
+		$rootScope, 
+		$ionicPopup, 
+		/*AuthService,*/ EVENTOS,
+		$ionicLoading )
+{
+	$scope.dados = {};
+	if ( localStorage.hasOwnProperty("login") === true )
+	{
+		$rootScope.usuario = localStorage.conta;
+		$rootScope.fotousu = localStorage.fotousu;
+		$location.path("/app/home");
+		$scope.$apply();
+	}
 
-    $scope.login = function (form, credentials) {
-        
-        if (!form.$valid) {
+    $scope.login = function( dados )
+	{
+        if ( !dados.email )
+		{
             $ionicPopup.alert({
-                title: 'Erro na entrada',
-                template: '<center>Conta e/ou senha vazia ou inválida</center>'
+                title: 'Erro!',
+                template: 'Preencha o campo de e-mail para continuar.'
             });
             return;
         }
-        
-        AuthService.login(credentials).then(function (user) {
-                $rootScope.$broadcast(EVENTOS.loginSuccess);
-                $scope.setCurrentUser(user);
-            }, function () {
-                $rootScope.$broadcast(EVENTOS.loginFailed);
+		
+		if ( !dados.senha )
+		{
+			$ionicPopup.alert({
+                title: 'Erro!',
+                template: 'Preencha o campo de senha para continuar.'
             });
-  /*        
-        $scope.arg = {};
-        $scope.arg.func = "LOGIN";
-        $scope.arg.conta = $scope.credentials.username;
-        $scope.arg.senha = $scope.credentials.password;
-        $scope.arg.id = 0;
-        var ret = sendserver ( $scope.arg, 0);
-
-        if ( ret === true ) {
-localStorage.removeItem ("firstlogin");
-
-            localStorage.login = true;
-            $rootScope.usuario = $scope.username;
-            localStorage.conta = $rootScope.usuario;
-            $rootScope.fotousu = "img/anonimo.jpg";
-            localStorage.fotousu = $rootScope.fotousu;
-            $location.path ("/app/home");
-        } else {
-            navigator.notification.alert ("Conta/Senha Inválida");
-            $scope.username = "";
-            $scope.password = "";
-        }
-*/
-    };
+            return;
+		}
+		
+		$ionicLoading.show({
+			template: '<ion-spinner icon="lines"></ion-spinner>&nbsp;Entrando...'
+		});
+		
+		$http.post( URL_LOGIN, 
+		{
+			email: email,
+			senha: senha
+		} ).success(function(json, status, headers, config)
+		{
+			$ionicLoading.hide();
+			if ( !json.error )
+			{
+				$scope.setCurrentUser( json );
+			} else
+			{
+				$ionicPopup.alert({
+					title: 'Erro!',
+					template: json.msg
+				});
+			}
+		});
+    }
     
     $scope.cadastro = function () {
-            $location.path("/cadastro1");
+        $location.path("/cadastro1");
     };
     
     $scope.randomstring = function () {

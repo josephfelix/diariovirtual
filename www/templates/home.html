@@ -1,7 +1,10 @@
 <ion-view align-title="center" view-title="<img src='img/logo.png' />">
 	<ion-content ng-controller="HomeCtrl" ng-init="init()">
-		<ion-refresher refreshing-icon="ion-loop" pulling-text="Pull to refresh" on-refresh="doRefresh()"></ion-refresher>
+		<ion-refresher refreshing-icon="ion-loop" pulling-text="Puxe para atualizar" on-refresh="doRefresh()"></ion-refresher>
 		<div class="list card">
+			<div class="item" ng-show="exemplo">
+				Exemplo
+			</div>
 			<div class="item item-input item-stacked-label item-icon-right">
 				<span class="input-label">Publicar status</span>
 				<i class="icon placeholder-icon diario-contador">{{ 140 - diariotexto.length}}</i>
