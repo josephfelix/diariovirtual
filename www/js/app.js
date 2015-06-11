@@ -1,26 +1,17 @@
-/* global angular: false */
-/* global window: false */
-/* global cordova: false */
-/* global StatusBar: false */
-/* global navigator: false */
-/* global document: false */
-/* global Camera: false */
-/* global alert: false */
-/* global $http: false */
-/* global localStorage: false */
-/* global ionic: false */
-/* global setTimeout: false */
+/**
+* ----------------------------------------------------
+*           Diário Virtual 0.1
+*         Desenvolvido por: Moboo
+*-----------------------------------------------------
+*/
 
-
-// Facebook APP_ID e APP_NAME (DiarioVirtual) colocados no plugin
-
-
+angular.module('diariovirtual.controllers', []);
 angular.module('diariovirtual', ['ionic', 'diariovirtual.controllers', 'ngCordova'])
 
 .run(function($ionicPlatform, $location, $ionicPopup, $rootScope) {
   $ionicPlatform.ready(function() {
       
-      $ionicPlatform.registerBackButtonAction(function(e){
+      /* $ionicPlatform.registerBackButtonAction(function(e){
         if ($rootScope.backButtonPressedOnceToExit) {
             ionic.Platform.exitApp();
         } else {
@@ -34,7 +25,7 @@ angular.module('diariovirtual', ['ionic', 'diariovirtual.controllers', 'ngCordov
             }
         e.preventDefault();
         return false;
-  },101);
+  },101); */
 
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -160,7 +151,7 @@ angular.module('diariovirtual', ['ionic', 'diariovirtual.controllers', 'ngCordov
   });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/login');
+  $urlRouterProvider.otherwise('/login');
 })
 
 .factory ("AuthService", function ($http, Session) {

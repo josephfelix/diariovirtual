@@ -1,24 +1,51 @@
 <ion-view align-title="center">
     <ion-nav-bar class="preto">
-    <ion-nav-title><img src='img/logo.png' /></ion-nav-title>
+		<ion-nav-back-button class="button-clear">
+			<i class="ion-arrow-left-c"></i>&nbsp;Voltar
+		</ion-nav-back-button>
+		<ion-nav-title><img src='img/logo.png' /></ion-nav-title>
     </ion-nav-bar>
   <ion-content class="padding" ng-controller="CadastroCtrl" ng-init="init()">
-      <div class="list list-inset">
-        <form name="CadForm"novalidate="">
-          <label class="item item-input">
-              <i class="icon ion-person placeholder-icon"></i>
-              <input type="text" placeholder="Nome da conta" ng-model="username" required>
-          </label>
-          <label class="item item-input">
-              <i class="icon ion-locked placeholder-icon"></i>
-              <input type="password" placeholder="Senha" ng-model="password" required>
-          </label>
-          <label class="item item-input">
-              <i class="icon ion-email placeholder-icon"></i>
-              <input type="email" placeholder="Email" ng-model="email" required>
-          </label>
-      <button class="button button-block button-calm" ng-click="enviar1(CadForm)"> Enviar</button>
-          </form>
+		<div class="list list-inset">
+			<div class="item item-divider">
+				<h2 align="center">
+					<strong>
+						Informe seus dados<br>abaixo para continuar
+					</strong>
+				</h2>
+			</div>
+			<label class="item item-input">
+				<i class="icon ion-person placeholder-icon"></i>
+				<input type="text" placeholder="Informe seu nome" ng-model="dados.nome" required>
+			</label>
+			<label class="item item-input">
+				<i class="icon ion-locked placeholder-icon"></i>
+				<input type="password" placeholder="Senha (6 até 11 dígitos)" ng-model="dados.senha" required>
+			</label>
+			<label class="item item-input">
+				<i class="icon ion-email placeholder-icon"></i>
+				<input type="email" placeholder="Informe seu e-mail" ng-model="dados.email" required>
+			</label>
+			<div class="item item-login-entrar" align="center">
+				<button class="button button-block button-login" type="button" ng-click="cadastrar( dados )">
+					Continuar&nbsp;<i class="ion-arrow-right-c"></i>
+				</button>
+			</div>
       </div>
     </ion-content>
+	<ion-footer-bar align-title="center" class="bar-dark">
+		<div class="row">
+			<div class="col-33">
+				<a href="#/app/privacidade" class="button">
+					<i class="icon ion-chatbubble"></i>
+					Privacidade
+				</a><br />
+			</div>
+			<div class="col-66">
+				<p align="right">2015 &copy; Di&aacute;rioVirtual<br />
+					Todos direitos reservados.
+				</p>
+			</div>
+		</div>
+	</ion-footer-bar>
 </ion-view>
