@@ -15,12 +15,12 @@
     <ion-header-bar class="bar diario-bar">
       <h1 class="title">Menu</h1>
     </ion-header-bar>
-    <ion-content class="diario-menu">
+    <ion-content class="diario-menu" ng-controller="MenuCtrl">
       <ion-list>
 		<a class="item item-avatar diario-menu-item" href="#/app/perfil">
-			<img ng-src="{{fotousu}}" />
+			<img ng-src="{{usuario.foto}}" error-src="img/anonimo.jpg" />
 			<p>Entrou como</p>
-			<h2>{{usuario}}</h2>
+			<h2>{{usuario.nome}}</h2>
 		</a>
         <ion-item nav-clear menu-close href="#/app/home" class="diario-menu-item">
 			<i class="ion-home diario-icon-menu"></i>&nbsp;In&iacute;cio
@@ -46,9 +46,8 @@
         <ion-item nav-clear menu-close href="#/app/configuracoes" class="diario-menu-item">
 			<i class="ion-gear-b diario-icon-menu"></i>&nbsp;Configura&ccedil;&otilde;es
 		</ion-item>
-<!--        <ion-item nav-clear menu-close href="#/app/logout" class="diario-menu-item"> -->
-        <ion-item nav-clear menu-close ng-controller="HomeCtrl" ng-click="logout()" class="diario-menu-item">
-			<i class="ion-gear-b diario-icon-menu"></i>&nbsp;Sair
+        <ion-item nav-clear menu-close ng-click="logout()" class="diario-menu-item">
+			<i class="ion-reply diario-icon-menu"></i>&nbsp;Sair
 		</ion-item>
       </ion-list>
     </ion-content>

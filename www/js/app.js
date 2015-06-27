@@ -1,12 +1,10 @@
-/**
-* ----------------------------------------------------
-*           Diário Virtual 0.1
-*         Desenvolvido por: Moboo
-*-----------------------------------------------------
-*/
-
 angular.module('diariovirtual.controllers', []);
-angular.module('diariovirtual', ['ionic', 'diariovirtual.controllers', 'ngCordova'])
+angular.module('diariovirtual', [
+	'ionic', 
+	'diariovirtual.directives', 
+	'diariovirtual.controllers', 
+	'ngCordova'
+])
 
 .run(function($ionicPlatform, $location, $ionicPopup, $rootScope) {
   $ionicPlatform.ready(function() {
@@ -46,146 +44,116 @@ angular.module('diariovirtual', ['ionic', 'diariovirtual.controllers', 'ngCordov
   $ionicConfigProvider.navBar.alignTitle("center");
   $stateProvider
 
-  .state('app', {
-    url: "/app",
-    abstract: true,
-    templateUrl: "templates/menu.html",
-//    controller: 'AppCtrl'
-  })
+	
+	.state('app', {
+		url: "/app",
+		abstract: true,
+		templateUrl: "templates/menu.html"
+	})
   
 	.state('login', {
 		url: "/login",
 		cache: false,
 		templateUrl: "templates/login.html"
 	})
+	
+	.state('termos', {
+		url: "/termos",
+		cache: false,
+		templateUrl: "templates/termos.html"
+	})
 
-  .state('profile', {
-    url: "/profile",
-    cache: false,
-    templateUrl: "templates/profile.html"
-  })
+	.state('profile', {
+		url: "/profile",
+		cache: false,
+		templateUrl: "templates/profile.html"
+	})
 
-  .state('cadastro1', {
-    url: "/cadastro1",
-    cache: false,
-    templateUrl: "templates/cadastro1.html"
-  })
+	.state('cadastro1', {
+		url: "/cadastro1",
+		cache: false,
+		templateUrl: "templates/cadastro1.html"
+	})
 
-  .state('cadastro2', {
-    url: "/cadastro2",
-    cache: false,
-    templateUrl: "templates/cadastro2.html"
-  })
+	.state('cadastro2', {
+		url: "/cadastro2",
+		cache: false,
+		templateUrl: "templates/cadastro2.html"
+	})
 
-  .state('app.home', {
-    url: "/home",
-    cache: false,
-    views: {
-      'menuContent': {
-        templateUrl: "templates/home.html"
-      }
-    }
-  })
+	.state('app.home', {
+		url: "/home",
+		cache: false,
+		views: {
+		  'menuContent': {
+			templateUrl: "templates/home.html"
+		  }
+		}
+	})
   
-  .state('app.diario', {
-    url: "/diario",
-    views: {
-      'menuContent': {
-        templateUrl: "templates/diario.html"
-      }
-    }
-  })
+	.state('app.diario', {
+		url: "/diario",
+		views: {
+		  'menuContent': {
+			templateUrl: "templates/diario.html"
+		  }
+		}
+	})
   
-  .state('app.notificacoes', {
-    url: "/notificacoes",
-    views: {
-      'menuContent': {
-        templateUrl: "templates/notificacoes.html"
-      }
-    }
-  })
+	.state('app.notificacoes', {
+		url: "/notificacoes",
+		views: {
+		  'menuContent': {
+			templateUrl: "templates/notificacoes.html"
+		  }
+		}
+	})
   
-  .state('app.mensagens', {
-    url: "/mensagens",
-    views: {
-      'menuContent': {
-        templateUrl: "templates/mensagens.html"
-      }
-    }
-  })
+	.state('app.mensagens', {
+		url: "/mensagens",
+		views: {
+		  'menuContent': {
+			templateUrl: "templates/mensagens.html"
+		  }
+		}
+	})
   
-  .state('app.solicitacoes', {
-    url: "/solicitacoes",
-    views: {
-      'menuContent': {
-        templateUrl: "templates/solicitacoes.html"
-      }
-    }
-  })
+	.state('app.solicitacoes', {
+		url: "/solicitacoes",
+		views: {
+		  'menuContent': {
+			templateUrl: "templates/solicitacoes.html"
+		  }
+		}
+	})
   
-  .state('app.procurar', {
-    url: "/procurar",
-    views: {
-      'menuContent': {
-        templateUrl: "templates/procurar.html"
-      }
-    }
-  })
+	.state('app.procurar', {
+		url: "/procurar",
+		views: {
+		  'menuContent': {
+			templateUrl: "templates/procurar.html"
+		  }
+		}
+	})
   
-  .state('app.amigos', {
-    url: "/amigos",
-    views: {
-      'menuContent': {
-        templateUrl: "templates/amigos.html"
-      }
-    }
-  })
+	.state('app.amigos', {
+		url: "/amigos",
+		views: {
+		  'menuContent': {
+			templateUrl: "templates/amigos.html"
+		  }
+		}
+	})
   
-  .state('app.configuracoes', {
-    url: "/configuracoes",
-    views: {
-      'menuContent': {
-        templateUrl: "templates/configuracoes.html"
-      }
-    }
-  });
-
-  // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/login');
-})
-
-.factory ("AuthService", function ($http, Session) {
-    var authService = {};
-          
-    authService.login = function (credentials) {
-        return $http
-            .post('/login', credentials)
-            .then(function (res) {
-                Session.create(res.data.id, res.data.user.id);
-                return res.data.user;
-            });
-    };
- 
-    authService.isAuthenticated = function () {
-        return !!Session.userId;
-    };
-})
-
-.service('Session', function () {
-    this.create = function (sessionId, userId) {
-        this.id = sessionId;
-        this.userId = userId;
-    };
-
-    this.destroy = function () {
-        this.id = null;
-        this.userId = null;
-    };
-})
-
-.constant ( "EVENTOS", {
-    loginSuccess: "sucesso-login",
-    loginFailed:  "falha-login",
-    logoutSucess: "sucesso-logout"
+	.state('app.configuracoes', {
+		url: "/configuracoes",
+		views: {
+		  'menuContent': {
+			templateUrl: "templates/configuracoes.html"
+		  }
+		}
+	});
+	
+	//$urlRouterProvider.otherwise('/login');
+	$urlRouterProvider.otherwise( localStorage.hasOwnProperty("login") ? 'app/home' : '/login' );
 });
-

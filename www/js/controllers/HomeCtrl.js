@@ -1,58 +1,39 @@
 angular.module('diariovirtual.controllers')
-.controller ("HomeCtrl", function ($scope, $ionicActionSheet, $rootScope, $location, $ionicPopup) {	
-    $scope.init = function () {
-        $scope.posts = [];
-        $scope.diariopublico = false;
-        $scope.diariotexto = "";
-        $scope.fotos = [];
-        
-        if( localStorage.hasOwnProperty("login") === true) {
-                $rootScope.usuario = localStorage.conta;
-                $rootScope.fotousu = localStorage.fotousu;
-                return;
+.controller('HomeCtrl', 
+	function(
+		$scope, 
+		$ionicActionSheet, 
+		$rootScope, 
+		$location, 
+		$ionicPopup,
+		$cordovaCamera,
+		$http,
+		$ionicLoading,
+		$timeout
+	)
+{
+	$scope.posts = [];
+	$scope.diariopublico = true;
+	$scope.diariotexto = "";
+	$scope.fotos = [];
+	
+    $scope.init = function()
+	{
+		if ( localStorage.hasOwnProperty('login') === false )
+		{
+			$location.path('/login');
+            return;
         }
-        
-//        localStorage.clear();
-localStorage.removeItem ("login");
-localStorage.removeItem ("conta");
-localStorage.removeItem ("fotousu");
-
-        $rootScope.usuario = "";
-        $rootScope.fotousu = "";
-        $location.path("/login");
-
-    };
+    }
     
-    $scope.logout = function () {
-
-        var confirmPopup = $ionicPopup.confirm({
-            title: 'Sair de sessão',
-            template: '<center>Confirma logout?</center>'
-        });
-        
-        confirmPopup.then(function(res) {
-            if(res) {
-//        localStorage.clear();
-localStorage.removeItem ("login");
-localStorage.removeItem ("conta");
-localStorage.removeItem ("fotousu");
-                $rootScope.usuario = "";
-                $rootScope.fotousu = "";
-                $location.path ("/login");
-            } else
-                $location.path ("/home");
-        });
-    };
-    
-    $scope.publish = function() {
-        
-            // Não deixa publicar vazio
-        if ($scope.diariotexto === "" && $scope.fotos.length === 0) {
+    $scope.publish = function()
+	{
+        if ( !$scope.diariotexto.length && !$scope.fotos.length )
+		{
             $ionicPopup.alert({
-                title: 'Publicação Vazia',
-                template: '<center>Coloque texto ou foto na publicação</center>'
+                title: 'Erro',
+                template: 'Insira um texto ou foto para publicar!'
             });
-            
             return;
         }
         
@@ -65,12 +46,13 @@ localStorage.removeItem ("fotousu");
         $scope.arg.texto = $scope.diariotexto;
         $scope.arg.publico = $scope.diariopublico;
         $scope.arg.fotos = $scope.fotos;
-        var ret = sendserver ( $scope.arg );
+       /*  var ret = sendserver ( $scope.arg );
         
-        if ( ret === false ) {
-            navigator.notification.alert ("Erro na publicação");
+        if ( ret === false )
+		{
+            navigator.notification.alert ("Erro na publicaÃ§Ã£o");
             return;
-        }
+        } */
         
         var temp = {};
         if ($rootScope.fotousu)
@@ -92,72 +74,106 @@ localStorage.removeItem ("fotousu");
         $scope.diariopublico = false;
         
         $scope.$apply();        
-    };
+    }
     
-    $scope.doRefresh = function() {
-        $scope.$broadcast('scroll.refreshComplete');
-        $scope.$apply();
-    };
+    $scope.doRefresh = function()
+	{
+		$ionicLoading.show({
+			template: '<i class="ion-load-c"></i>&nbsp;Carregando...'
+		});
+		
+		$timeout(function()
+		{
+			$http.post( URL_DIARIO + 'timeline/get', 
+			{
+				iduser: $rootScope.usuario.id
+			}).then( function( result )
+			{
+				$ionicLoading.hide();
+				var json = result.data;
+				for ( var ind in json )
+				{
+					$scope.posts.push( json[ind] );
+				}
+				$scope.$apply();
+				$scope.$broadcast('scroll.refreshComplete');
+			});
+		}, 3000);
+    }
 
-    $scope.getphoto = function() {    
-
-        var fonte = [
+    $scope.getphoto = function()
+	{
+		var fonte = [
             Camera.PictureSourceType.CAMERA,
             Camera.PictureSourceType.PHOTOLIBRARY
         ];
-    
-    
-        var hideSheet = $ionicActionSheet.show({
-            buttons: [
-                { text: 'Câmera' },
-                { text: 'Galeria' }
-            ],
-            titleText: 'Selecione a origem da foto',
-            cancelText: 'Cancelar',
-            cancel: function() {
-                // add cancel code..
-                },
-            buttonClicked: function(index) {
-                navigator.camera.getPicture(onPhotoSuccess, onFail, { 
-                    quality: 50, 
-                    destinationType: Camera.DestinationType.DATA_URL, 
-                    sourceType: fonte[index],
-                    mediaType: Camera.MediaType.PICTURE,
-                    correctOrientation: true,
-                    targetWidth: 150,
-                    targetHeight: 150
-                });        
-
-                return true;
-            }
-        });
-    };
-
-    function onFail () {
-        navigator.notification.alert ("Erro ao carregar foto");
-    }
-
-    function onPhotoSuccess (imageData) {
-        $scope.fotos.push ("data:image/jpeg;base64," + imageData);
-        $scope.$apply();
+		
+		var options = {
+			'androidTheme': window.plugins.actionsheet.ANDROID_THEMES.THEME_HOLO_LIGHT,
+			'title': 'Selecione a origem da foto',
+			'buttonLabels': ['Tirar foto agora (CÃ¢mera)', 'Buscar da galeria'],
+			'androidEnableCancelButton' : true,
+			'winphoneEnableCancelButton' : true,
+			'addCancelButtonWithLabel': 'Cancelar',
+			'position': [20, 40]
+		};
+		
+		window.plugins.actionsheet.show(options, function( opc )
+		{
+			if ( opc != 3 )
+			{
+				$cordovaCamera.getPicture(
+				{
+					quality: 50, 
+					destinationType: Camera.DestinationType.DATA_URL, 
+					sourceType: fonte[opc-1],
+					mediaType: Camera.MediaType.PICTURE,
+					correctOrientation: true,
+					targetWidth: 150,
+					targetHeight: 150
+				}).then(function(imageData)
+				{
+					$scope.fotos.push("data:image/jpeg;base64," + imageData);
+					$scope.$apply();
+				}, function(err){});
+			}
+		});
     }
     
-    $scope.remove = function (index) {
-     var confirmPopup = $ionicPopup.confirm({
-       title: 'Imagem selecionada',
-       template: 'Confirma a remoção da foto'
-     });
-     confirmPopup.then(function(res) {
-       if(res) {
-         $scope.fotos.splice ( index, 1);
-       } 
-     });
-
-    };
-    
-    function sendserver (args) {
-        navigator.notification.alert (JSON.stringify(args, null, 4));
-        return true;
+    $scope.remove = function( index )
+	{
+		$ionicPopup.confirm(
+		{
+			title: 'Remover foto',
+			template: 'Tem certeza que deseja remover esta foto da postagem?'
+		})
+		.then(function(res)
+		{
+		   if ( res )
+		   {
+				$scope.fotos.splice(index, 1);
+		   } 
+		});
     }
-
+	
+	$ionicLoading.show({
+		template: '<i class="ion-load-c ion-spin-animation"></i>&nbsp;Carregando...'
+	});
+	
+	$timeout(function()
+	{
+		$http.post( URL_DIARIO + 'timeline/get', 
+		{
+			iduser: $rootScope.usuario.id
+		}).then( function( result )
+		{
+			$ionicLoading.hide();
+			var json = result.data;
+			for ( var ind in json )
+			{
+				$scope.posts.push( json[ind] );
+			}
+			$scope.$apply();
+		});
+	}, 3000);
 })

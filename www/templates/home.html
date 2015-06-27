@@ -2,29 +2,24 @@
 	<ion-content ng-controller="HomeCtrl" ng-init="init()">
 		<ion-refresher refreshing-icon="ion-loop" pulling-text="Puxe para atualizar" on-refresh="doRefresh()"></ion-refresher>
 		<div class="list card">
-			<div class="item" ng-show="exemplo">
-				Exemplo
-			</div>
 			<div class="item item-input item-stacked-label item-icon-right">
 				<span class="input-label">Publicar status</span>
 				<i class="icon placeholder-icon diario-contador">{{ 140 - diariotexto.length}}</i>
 				<input type="text" ng-model="diariotexto" class="diario-texto-publicar" placeholder="No que est&aacute; pensando?" maxlength="140"/>
 
- <div class="list list-inset">
-    <div class="row" ng-repeat="foto in fotos track by $index" ng-if="$index % 3 === 0">
-        <div class="col col-33" ng-if="$index < fotos.length">
-            <img ng-src="{{fotos[$index]}}" width="100%" ng-click="remove($index)"/>
-        </div>
-        <div class="col col-33" ng-if="$index + 1 < fotos.length">
-            <img ng-src="{{fotos[$index + 1]}}" width="100%" ng-click="remove($index + 1)"/>
-        </div>
-        <div class="col col-33" ng-if="$index + 2 < fotos.length">
-            <img ng-src="{{fotos[$index + 2]}}" width="100%" ng-click="remove($index + 2)"/>
-        </div>
-    </div>
-</div>
-                
-<!--                <img style="display:none;" id="dispImage" src="" /> -->
+				 <div class="list list-inset">
+					<div class="row" ng-repeat="foto in fotos track by $index" ng-if="$index % 3 === 0">
+						<div class="col col-33" ng-if="$index < fotos.length">
+							<img ng-src="{{fotos[$index]}}" width="100%" ng-click="remove($index)"/>
+						</div>
+						<div class="col col-33" ng-if="$index + 1 < fotos.length">
+							<img ng-src="{{fotos[$index + 1]}}" width="100%" ng-click="remove($index + 1)"/>
+						</div>
+						<div class="col col-33" ng-if="$index + 2 < fotos.length">
+							<img ng-src="{{fotos[$index + 2]}}" width="100%" ng-click="remove($index + 2)"/>
+						</div>
+					</div>
+				</div>
 			</div>
 			<div class="item no-padding">
 				<div class="row">
@@ -39,21 +34,23 @@
 							P&uacute;blico
 						</div>
 					</div>
-						<button ng-click="getphoto()" class="button button-royal" type="button">Foto</button>
 					<div class="col">
-						<button ng-click="publish()" class="button button-energized pull-right" type="button">Publicar</button>
+						<button type="button" ng-click="getphoto()" class="button button-energized">
+							<i class="ion-camera"></i>
+						</button>
+						<button ng-click="publish()" type="button" class="button button-energized">Publicar</button>
 					</div>
 				</div>
 			</div>
 		</div>
         
       
-<div class="list card" class="row" ng-repeat="post in posts">
+		<div class="list card" ng-repeat="post in posts">
 			<div class="item item-avatar">
-				<img ng-src="{{post.ownerimg}}">
-				<h2>{{post.ownername}}</h2>
-				<p>{{post.date}}&nbsp;
-                        <i ng-if="!post.publico" class="ion-locked"></i>
+				<img ng-src="{{post.usuario.foto}}" error-src="img/anonimo.jpg" />
+				<h2>{{post.usuario.nome}}</h2>
+				<p>{{post.data}}&nbsp;
+                    <i ng-if="post.publico == '0'" class="ion-locked"></i>
                 </p>
 			</div>
 
@@ -80,20 +77,17 @@
 				<a href="#" class="tab-item">
 					<i class="icon ion-thumbsup"></i>
 					Curtir
-					<span class="diario-numero-destaque">3</span>
 				</a>
 				<a class="tab-item" href="#">
 					<i class="icon ion-chatbox"></i>
 					Comentar
-					<span class="diario-numero-destaque">5</span>
 				</a>
 				<a class="tab-item" href="#">
 					<i class="icon ion-share"></i>
 					Compartilhar
-					<span class="diario-numero-destaque">3</span>
 				</a>
 			</div>
-</div>
+		</div>
 				
 		<div class="list card">
 			<div class="item">

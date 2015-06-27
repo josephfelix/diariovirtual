@@ -1,3 +1,4 @@
+var dadosEnviar = {};
 angular.module('diariovirtual.controllers')
 
 .controller('CadastroCtrl', function(
@@ -14,13 +15,18 @@ angular.module('diariovirtual.controllers')
 		var check = /@[\w\-]+\./;
 		var checkend = /\.[a-zA-Z]{2,3}$/;
 		
-		$scope.init = function () {
-			if( localStorage.hasOwnProperty("login") === true) {
-				$rootScope.usuario = localStorage.conta;
-				$rootScope.fotousu = localStorage.fotousu;
+		$scope.init = function()
+		{
+			if ( localStorage.hasOwnProperty("login") === true )
+			{
+				$rootScope.usuario = JSON.parse( localStorage.usuario );
 				$location.path("/app/home");
+				return;
 			}
-		};
+		}
+		
+		$scope.fotoUsuario = '#';
+		
 		$scope.cadastrar = function( dados )
 		{
 			if ( !dados )
@@ -70,36 +76,126 @@ angular.module('diariovirtual.controllers')
 				return;
 			}
 			
+			var networkState = navigator.connection.type;
+			if ( networkState != Connection.NONE )
+			{
+				$http.post( URL_DIARIO + 'registrar/verificar', dados )
+				.success(function(json, status, headers, config)
+				{
+					if ( json.error == 0 )
+					{
+						dadosEnviar.nome = dados.nome;
+						dadosEnviar.email = dados.email;
+						dadosEnviar.senha = dados.senha;
+						$location.path("/cadastro2");
+					} else
+					{
+						dados.email = '';
+						dados.nome = '';
+						dados.senha = '';
+						$ionicPopup.alert({
+							title: 'Erro!',
+							template: 'ERRO: ' + json.msg
+						});
+					}
+				})
+				.error(function(json, status, headers, config)
+				{
+					dados.email = '';
+					dados.nome = '';
+					dados.senha = '';
+					$ionicPopup.alert({
+						title: 'Erro!',
+						template: 'ERRO: Ocorreu um erro no cadastro, cheque sua conexão com a internet para continuar.'
+					});
+				});
+			} else
+			{
+				$ionicPopup.alert({
+					title: 'Erro!',
+					template: 'ERRO: Ocorreu um erro no cadastro, cheque sua conexão com a internet para continuar.'
+				});
+			}
+		}  
+
+		$scope.selecionarFoto = function()
+		{
+			var fonte = [
+				Camera.PictureSourceType.CAMERA,
+				Camera.PictureSourceType.PHOTOLIBRARY
+			];
+		
+			var hideSheet = $ionicActionSheet.show(
+			{
+				buttons: [
+					{ text: '<i class="icon ion-camera"></i>&nbsp;Tirar foto' },
+					{ text: '<i class="icon ion-images"></i>&nbsp;Selecionar da galeria' }
+				],
+				titleText: 'Selecione a origem da foto',
+				cancelText: 'Cancelar',
+				buttonClicked: function(index)
+				{
+					navigator.camera.getPicture(function(imageData)
+					{
+						$scope.fotoUsuario = imageData;
+						$scope.escolheufoto = true;
+					}, function()
+					{
+						$ionicPopup.alert({
+							title: 'Erro!',
+							template: 'ERRO: Ocorreu um erro ao selecionar sua foto, tente novamente.'
+						});
+					},
+					{ 
+						quality: 50, 
+						destinationType: Camera.DestinationType.DATA_URL, 
+						sourceType: fonte[index],
+						mediaType: Camera.MediaType.PICTURE,
+						correctOrientation: true,
+						targetWidth: 175,
+						targetHeight: 175
+					}); 
+					return true;
+				}
+			});
+		}
+
+		$scope.completarCadastro = function()
+		{
+			if ( $scope.escolheufoto )
+				dadosEnviar.foto = $scope.fotoUsuario;
+			else
+				dadosEnviar.foto = "#";
+			
 			$ionicLoading.show({
 				template: '<ion-spinner icon="lines"></ion-spinner>&nbsp;Cadastrando...'
 			});
 		
-			$http.post( URL_CADASTRO, dados )
+			$http.post( URL_DIARIO + 'registrar', dadosEnviar )
 			.success(function(json, status, headers, config)
 			{
 				$ionicLoading.hide();
-				if ( json.status == 'OK' )
+				if ( json.error == 0 )
 				{
-					$scope.arg = {};
-					$scope.arg.func = "CADASTRO";
-					$scope.arg.conta = $scope.username;
-					$scope.arg.senha = $scope.password;
-					$scope.arg.email = $scope.email;        
-					var ret = sendserver ( $scope.arg );
-
-					if ( ret === true ) {
-						$rootScope.escolheufoto = false;
-						$rootScope.fotousu = "";
-						localStorage.conta = $scope.username;
-						$location.path ("/cadastro2");
-					} else {
-						navigator.notification.alert ("Erro ao tentar criar cadastro");
-					}
+					localStorage.login = true;
+					window.usuario = {
+						nome: dadosEnviar.nome,
+						email: dadosEnviar.email,
+						foto: dadosEnviar.foto,
+						id: json.id,
+						facebook: false
+					};
+					localStorage.usuario = JSON.stringify( window.usuario );
+					$ionicPopup.alert({
+						title: 'Sucesso!',
+						template: json.msg
+					});
+					$location.path("/app/home");
 				} else
 				{
 					$ionicPopup.alert({
 						title: 'Erro!',
-						template: 'ERRO: Ocorreu um erro no servidor, tente novamente mais tarde.'
+						template: 'ERRO: ' + json.msg
 					});
 				}
 			})
@@ -111,82 +207,6 @@ angular.module('diariovirtual.controllers')
 					template: 'ERRO: Ocorreu um erro no cadastro, cheque sua conexão com a internet para continuar.'
 				});
 			});
-		}    
-
-		$scope.getphoto = function() {    
-
-			var fonte = [
-				Camera.PictureSourceType.CAMERA,
-				Camera.PictureSourceType.PHOTOLIBRARY
-			];
-		
-
-			var hideSheet = $ionicActionSheet.show({
-				buttons: [
-					{ text: 'Câmera' },
-					{ text: 'Galeria' }
-				],
-				titleText: 'Selecione a origem da foto',
-				cancelText: 'Cancelar',
-				cancel: function() {
-					// add cancel code..
-					},
-				buttonClicked: function(index) {
-					navigator.camera.getPicture(onPhotoSuccess, onFail, { 
-						quality: 50, 
-						destinationType: Camera.DestinationType.DATA_URL, 
-						sourceType: fonte[index],
-						mediaType: Camera.MediaType.PICTURE,
-						correctOrientation: true,
-						targetWidth: 175,
-						targetHeight: 175
-					});        
-
-					return true;
-				}
-			});
-		};
-
-		$scope.enviar2 = function () {
-			if ( $rootScope.escolheufoto ) {
-				$scope.arg = {};
-				$scope.arg.conta = localStorage.conta;
-				$scope.arg.func = "CADASTRO";
-				$scope.arg.foto = $rootScope.dispImage.src;
-				var ret = sendserver ( $scope.arg );
-				
-				if ( ret === false ) {
-					navigator.notification.alert ("Erro ao tentar cadastrar");
-					$location.path ("/cadastro");
-					return;
-				} else
-					$rootScope.fotousu = $rootScope.dispImage.src;                
-			} else {
-				$rootScope.fotousu = "img/anonimo.jpg";
-			}
-				
-			localStorage.login = true;
-			localStorage.fotousu = $rootScope.fotousu;
-			$rootScope.usuario = localStorage.conta;
-					
-			$rootScope.escolheufoto = false;
-			$location.path ("/app/home");
-			$scope.$apply();
-		};    
-
-		function onPhotoSuccess (imageData) {
-			$rootScope.dispImage = document.getElementById('profileImage');
-			$rootScope.dispImage.src = "data:image/jpeg;base64," + imageData;
-			$rootScope.escolheufoto = true;
-		}
-		
-		function onFail () {
-			navigator.notification.alert ("Erro ao carregar foto");
-		}
-		
-		function sendserver (args) {
-			navigator.notification.alert (JSON.stringify(args, null, 4));
-			return true;
 		}
 	}
 )

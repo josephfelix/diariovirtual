@@ -5,5 +5,4 @@
 * +--------------------------------------------------+
 */
 
-const URL_LOGIN = 'http://www.google.com.br';
-const URL_CADASTRO = 'http://www.google.com.br';
+const URL_DIARIO = 'http://virtualdiario.com.br/';

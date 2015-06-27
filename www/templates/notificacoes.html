@@ -1,26 +1,12 @@
 <ion-view view-title="<img src='img/logo.png' />">
-	<ion-content>
+	<ion-content ng-controller="NotificacoesCtrl">
 		<ion-refresher refreshing-icon="ion-loop"></ion-refresher>
 		<div class="list card">
-			<div class="item item-avatar item-icon-right">
-				<img src="img/anonimo.jpg">
-				<h2><strong>Felipe Barros</strong></h2>
-				<p>adicionou <strong>Joseph Felix</strong> como amigo!</p>
-				<i class="icon ion-person-add diario-icone-notification"></i>
-			</div>
-			
-			<div class="item item-avatar item-icon-right">
-				<img src="img/anonimo.jpg">
-				<h2><strong>Felipe Barros</strong></h2>
-				<p>alterou seu perfil!</p>
-				<i class="icon ion-gear-b diario-icone-notification"></i>
-			</div>
-			
-			<div class="item item-avatar item-icon-right">
-				<img src="img/anonimo.jpg">
-				<h2><strong>Felipe Barros</strong></h2>
-				<p>publicou em seu di&aacute;rio!</p>
-				<i class="icon ion-document-text diario-icone-notification"></i>
+			<div class="item item-avatar item-icon-right" ng-repeat="notification in notifications">
+				<img ng-src="{{notification.usuario.foto}}" error-src="img/anonimo.jpg" />
+				<h2><strong>{{notification.usuario.nome}}</strong></h2>
+				<p>{{notification.texto}}</p>
+				<i class="{{notification.icone}}" ng-show="notification.icone.length > 0"></i>
 			</div>
 			
 			<div class="item">

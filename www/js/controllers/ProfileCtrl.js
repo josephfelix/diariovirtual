@@ -1,13 +1,23 @@
 angular.module('diariovirtual.controllers')
 
-.controller ("ProfileCtrl", function ($scope, $location, $rootScope) {
-        
+.controller("ProfileCtrl", 
+	function(
+		$scope,
+		$http,
+		$location,
+		$rootScope, 
+		$ionicPopup,
+		$ionicLoading
+	)
+{        
     $scope.init = function() {
         $scope.amigosselecionados = [];
     };
     
-    $scope.add = function (index) {
-        $scope.amigosselecionados.push ($rootScope.friends[index]);
+    $scope.adicionarAmigo = function( friend )
+	{
+		alert( JSON.stringify( friend ) );
+        //$scope.amigosselecionados.push( friend );
     };
     
     $scope.envia = function () {

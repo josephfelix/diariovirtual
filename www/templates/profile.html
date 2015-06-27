@@ -3,31 +3,24 @@
     <ion-nav-title><img src='img/logo.png' /></ion-nav-title>
     </ion-nav-bar>
 <ion-content class="padding" ng-controller="ProfileCtrl" ng-init="init()">
-<div class="list list-inset">
-    <div class="row" ng-repeat="friend in friends" ng-if="$index % 3 === 0">
-        <div class="col col-33" ng-if="$index < friends.length">
-            <img ng-src="{{friends[$index].src}}" width="100%" />
-            <center>
-                <h5>{{friends[$index].name}}</h5>
-            <button class="button button-positive" ng-click="add($index)">Adicionar</button>
-            </center>
-        </div>
-        <div class="col col-33" ng-if="$index + 1 < friends.length">
-            <img ng-src="{{friends[$index + 1].src}}" width="100%" />
-            <center>
-                <h5>{{friends[$index + 1].name}}</h5>
-            <button class="button button-positive" ng-click="add($index+1)">Adicionar</button>
-            </center>
-        </div>
-        <div class="col col-33" ng-if="$index + 2 < friends.length">
-            <img ng-src="{{friends[$index + 2].src}}" width="100%" />
-            <center>
-                <h5>{{friends[$index + 2].name}}</h5>
-            <button class="button button-positive" ng-click="add($index+2)">Adicionar</button>
-            </center>
-        </div>
-    </div>
-    <button class="button button-block button-calm" ng-click="envia()">Continuar</button>
-</div>
+	<div class="list list-inset">
+		<div class="item item-divider">
+			<h2 align="center">
+				<strong>
+					Seus amigos que j&aacute;<br>usam o Diario Virtual
+				</strong>
+			</h2>
+		</div>
+		<div class="item item-avatar" ng-repeat="friend in friends">
+			<img ng-src="{{friend.src}}" error-src="img/anonimo.jpg" />
+			<h2>{{friend.name}}</h2>
+			<p>
+				<button class="button button-block button-positive" ng-click="adicionarAmigo(friend)">
+					<i class="ion-plus"></i>&nbsp;Adicionar
+				</button>
+			</p>
+		</div>
+		<button class="button button-block button-calm" ng-click="envia()">Continuar</button>
+	</div>
 </ion-content>
 </ion-view>

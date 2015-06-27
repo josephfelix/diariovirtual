@@ -6,20 +6,19 @@ angular.module('diariovirtual.controllers')
 		$location, 
 		$rootScope, 
 		$ionicPopup, 
-		/*AuthService,*/ EVENTOS,
-		$ionicLoading )
+		$ionicLoading,
+		$cordovaFacebook )
 {
 	$scope.dados = {};
 	if ( localStorage.hasOwnProperty("login") === true )
 	{
-		$rootScope.usuario = localStorage.conta;
-		$rootScope.fotousu = localStorage.fotousu;
+		$rootScope.usuario = JSON.parse( localStorage.usuario );
 		$location.path("/app/home");
-		$scope.$apply();
+		return;
 	}
 
     $scope.login = function( dados )
-	{
+	{			
         if ( !dados.email )
 		{
             $ionicPopup.alert({
@@ -39,115 +38,121 @@ angular.module('diariovirtual.controllers')
 		}
 		
 		$ionicLoading.show({
-			template: '<ion-spinner icon="lines"></ion-spinner>&nbsp;Entrando...'
+			template: '<i class="ion-load-c ion-spin-animation"></i>&nbsp;Entrando...'
 		});
 		
-		$http.post( URL_LOGIN, 
-		{
-			email: email,
-			senha: senha
-		} ).success(function(json, status, headers, config)
-		{
-			$ionicLoading.hide();
-			if ( !json.error )
+		var networkState = navigator.connection.type;
+		if ( networkState != Connection.NONE )
+		{			
+			$http.post( URL_DIARIO + 'login/?cache=' + Math.random(), 
 			{
-				$scope.setCurrentUser( json );
-			} else
+				email: dados.email,
+				senha: dados.senha
+			} )
+			.then(function(response)
 			{
-				$ionicPopup.alert({
-					title: 'Erro!',
-					template: json.msg
-				});
-			}
-		});
+				$ionicLoading.hide();
+				var json = response.data;
+				if ( json.error == 0 )
+				{
+					$rootScope.usuario = {
+						nome: json.nome,
+						email: json.email,
+						id: json.id,
+						foto: json.foto,
+						facebook: false
+					};
+					localStorage.usuario = JSON.stringify( $rootScope.usuario );
+					localStorage.login = true;
+					$location.path("/app/home");
+				} else
+				{
+					$ionicPopup.alert({
+						title: 'Erro!',
+						template: json.msg
+					});
+				}
+			});
+		} else
+		{
+			$ionicPopup.alert({
+				title: 'Erro!',
+				template: 'ERRO: Ocorreu um erro no cadastro, cheque sua conexao com a internet para continuar.'
+			});
+		}
     }
     
-    $scope.cadastro = function () {
+    $scope.irParaCadastro = function()
+	{
         $location.path("/cadastro1");
     };
     
-    $scope.randomstring = function () {
-        var s= '';
-        var tam = 8;
-        
-        var randomchar=function(){
-            var n= Math.floor(Math.random()*62);
-            if(n<10) return n; //1-10
-            if(n<36) return String.fromCharCode(n+55); //A-Z
-            return String.fromCharCode(n+61); //a-z
-        };
-        
-        while(tam--) s+= randomchar();
-        return s;
-    };
-    
-    $scope.loginfb = function() {
+    $scope.loginFacebook = function()
+	{
         $rootScope.friends = [];
-
-        facebookConnectPlugin.login (["email", "user_friends"], $scope.loginfbsucesso,
-            function (error) {
-                    // se deu erro, pode ser o access token expired
-                    // tenta de novo então
-                facebookConnectPlugin.login (["email", "user_friends"], $scope.loginfbsucesso,
-                    function (error) {
-                        navigator.notification.alert ("Erro no login do Fabcebook " + JSON.stringify (error,null,4));
-                });
-            });
-    };
-     
-    $scope.loginfbsucesso = function (result) {
-                if (result.status === 'connected') {
-                    localStorage.accessToken = result.authResponse.accessToken;
-                    $scope.pegadadosfb();
-                }
-    };
-        
-    $scope.pegadadosfb = function() {
-           facebookConnectPlugin.api("me/?fields=id,name,email,friends",["user_friends"],
-                function (result) {
-
-                    localStorage.login = true;
-                    $rootScope.usuario = result.name;
-                    localStorage.conta = result.name;
-                    $rootScope.fotousu = "https://graph.facebook.com/"+ result.id + "/picture?type=square";
-                    localStorage.fotousu = $rootScope.fotousu;
-                    $rootScope.friends = [];
-               
-                    $scope.arg = {};
-                    $scope.arg.func = "LOGINFB";
-                    $scope.arg.id = result.id;
-                    $scope.arg.conta = result.name;
-                    $scope.arg.senha = $scope.randomstring();
-                    $scope.arg.email = result.email;
-                    var ret = sendserver ( $scope.arg, 1 );
-                                   
-                    if ( ret === true )   // primeiro login 
-                        $rootScope.friends = result.friends.data;
- 
-                    if ( $rootScope.friends.length === 0 )
-                        $location.path ("/app/home");
-                    else {
-                        for(var i=0; i < $rootScope.friends.length; i++) {
-                            $rootScope.friends[i].src = "https://graph.facebook.com/" + $rootScope.friends[i].id + "/picture?type=square";
-                        }
-                        $location.path("/profile");
-                    }
-                    $scope.$apply();
-                }, 
-                function (error) {
-                    navigator.notification.alert ("Erro "+ error + " ao pegar dados do Facebook");
-                });
-    };
-
-    function sendserver (args, fb) {
-        navigator.notification.alert (JSON.stringify(args, null, 4));
-        if ( fb === 1 ) {
-            if( localStorage.hasOwnProperty("firstlogin") === true)
-                return false;
-        
-            localStorage.firstlogin = true;
-        }
-        return true;
+		try{
+        $cordovaFacebook.login(["email", "user_friends"], 
+		function(result)
+		{
+			if ( result.status === 'connected' )
+			{
+                $cordovaFacebook.api("me/?fields=id,name,email,friends", ["user_friends"],
+				function(result)
+				{
+					alert(result.name);
+					$http.post( URL_DIARIO + 'login/facebook/?cache=' + Math.random(), 
+					{
+						nome: result.name,
+						email: result.email,
+						id: result.id
+					})
+					.success(function(json, status, headers, config)
+					{
+						localStorage.login = true;
+						$rootScope.usuario = {
+							nome: json.nome,
+							email: json.email,
+							id: json.id,
+							foto: json.foto,
+							facebook: true
+						};
+						localStorage.usuario = JSON.stringify( $rootScope.usuario );
+						$scope.friends = [];
+									   
+						if ( json.firstlogin )
+						{
+							$scope.friends = result.friends.data;
+							if ( $scope.friends.length )
+							{
+								for ( var ind in $scope.friends )
+									$scope.friends[ind].src = "http://graph.facebook.com/" + $scope.friends[ind].id + "/picture?type=square";
+								$location.path("/profile");
+							} else
+								$location.path("/app/home");
+						} else
+						{
+							$location.path("/app/home");
+						}
+					})
+					.error(function(json, status, headers, config)
+					{
+						$ionicLoading.hide();
+						$ionicPopup.alert({
+							title: 'Erro!',
+							template: 'ERRO: Ocorreu um erro no login, cheque sua conexao com a internet para continuar.'
+						});
+					});
+				}, 
+				function (error)
+				{
+					navigator.notification.alert ("Erro "+ error + " ao pegar dados do Facebook");
+				});
+            }
+		},
+		function (error)
+		{
+			navigator.notification.alert ("Erro no login do Fabcebook " + JSON.stringify (error,null,4));
+		});
+		}catch(er){alert(er);}
     }
-
 })

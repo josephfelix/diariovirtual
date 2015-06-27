@@ -3,12 +3,28 @@
     <ion-nav-title><img src='img/logo.png' /></ion-nav-title>
     </ion-nav-bar>
   <ion-content class="padding" ng-controller="CadastroCtrl">
-      <br>
-      <center><h3>Foto atual</h3>
-        <img style="display:block; width: 175px; height: 175px;" id="profileImage" src="img/anonimo.jpg" />
-      </center>
-        <button ng-click="getphoto()" class="button button-block button-royal" type="button">Selecione uma Foto (opcional)</button>
-      <button class="button button-block button-calm" ng-click="enviar2()">Enviar</button>
-<br>
+		<div class="list list-inset">
+			<div class="item item-divider">
+				<h2 align="center">
+					<strong>
+						Envie sua foto para<br />completar seu cadastro
+					</strong>
+				</h2>
+			</div>
+			<div class="item item-thumbnail-left">
+				<img ng-src="{{fotoUsuario}}" error-src="img/anonimo.jpg" />
+				<h2 align="center">Foto atual</h2>
+				<p>
+					<button ng-click="selecionarFoto()" class="button button-block button-dark" type="button">
+						<i class="ion-camera"></i>&nbsp;Alterar foto
+					</button>
+				</p>
+			</div>
+			<div class="item">
+				<button class="button button-block button-login" ng-click="completarCadastro()">
+					Continuar&nbsp;<i class="ion-arrow-right-c"></i>
+				</button>
+			</div>
+		</div>
     </ion-content>
 </ion-view>
