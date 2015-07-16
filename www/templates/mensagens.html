@@ -1,5 +1,27 @@
 <ion-view view-title="<img src='img/logo.png' />">
-	<ion-content>
-		Home
+	<ion-nav-buttons side="right">
+		<button class="button button-icon button-clear ion-ios-chatbubble" menu-toggle="right"></button>
+	</ion-nav-buttons>
+	<ion-content ng-controller="MensagensCtrl">
+		<div class="list list-inset card">
+			<div class="item item-divider">
+				<h2 align="center">
+					<strong>
+						Mensagens
+					</strong>
+				</h2>
+			</div>
+			
+			<div ng-click="verConversa(message)" class="item item-avatar item-icon-right" ng-repeat="message in messages">
+				<img ng-src="{{message.usuario.tipo == 'FACEBOOK' ? message.usuario.foto : URL_DIARIO + 'upload/' + message.usuario.foto}}" error-src="img/anonimo.jpg" />
+				<h2>{{message.usuario.nome}}</h2>
+				<p>{{message.mensagem}}</p>
+				<i class="icon ion-chevron-right energized"></i>
+			</div>
+			
+			<div class="item item-text-wrap" align="center" ng-show="!messages.length">
+				Nenhuma mensagem encontrada, clique no &iacute;cone de Chat no menu direito e inicie uma conversa com algu&eacute;m.
+			</div>
+		</div>
 	</ion-content>
 </ion-view>

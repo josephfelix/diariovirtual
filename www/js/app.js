@@ -3,12 +3,26 @@ angular.module('diariovirtual', [
 	'ionic', 
 	'diariovirtual.directives', 
 	'diariovirtual.controllers', 
-	'ngCordova'
+	'ngCordova',
+	'monospaced.elastic'
 ])
 
 .run(function($ionicPlatform, $location, $ionicPopup, $rootScope) {
   $ionicPlatform.ready(function() {
       
+	$ionicPlatform.registerBackButtonAction(function(event)
+	{
+		if ( localStorage.hasOwnProperty("login") === false )
+		{
+			navigator.notification.confirm('Tem certeza que deseja fechar o Diario Virtual?',
+			function(opc)
+			{
+				if ( opc == 2 )
+					ionic.Platform.exitApp();
+			}, "Sair", ["Cancelar", "OK"]);
+		}
+	}, 100);
+
       /* $ionicPlatform.registerBackButtonAction(function(e){
         if ($rootScope.backButtonPressedOnceToExit) {
             ionic.Platform.exitApp();
@@ -90,6 +104,28 @@ angular.module('diariovirtual', [
 		  }
 		}
 	})
+	
+	.state('app.perfil', {
+		url: "/perfil/:id",
+		views: {
+		  'menuContent': {
+			templateUrl: "templates/perfil.html"
+		  }
+		}
+	})
+	
+	.state('app.chat', {
+		url: "/chat/:id",
+		views: {
+		  'menuContent': {
+			templateUrl: "templates/chat.html",
+			controller: 'ChatConversationCtrl'
+		  }
+		},
+		params: { 
+			amigo: null
+		}
+	})
   
 	.state('app.diario', {
 		url: "/diario",
@@ -123,15 +159,6 @@ angular.module('diariovirtual', [
 		views: {
 		  'menuContent': {
 			templateUrl: "templates/solicitacoes.html"
-		  }
-		}
-	})
-  
-	.state('app.procurar', {
-		url: "/procurar",
-		views: {
-		  'menuContent': {
-			templateUrl: "templates/procurar.html"
 		  }
 		}
 	})

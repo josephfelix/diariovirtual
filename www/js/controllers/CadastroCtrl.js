@@ -76,12 +76,12 @@ angular.module('diariovirtual.controllers')
 				return;
 			}
 			
-			var networkState = navigator.connection.type;
-			if ( networkState != Connection.NONE )
+			if ( !$rootScope.offline )
 			{
-				$http.post( URL_DIARIO + 'registrar/verificar', dados )
-				.success(function(json, status, headers, config)
+				$http.post( URL_DIARIO + 'registrar/verificar/?cache=' + Math.random(), dados )
+				.then(function(result)
 				{
+					var json = result.data;
 					if ( json.error == 0 )
 					{
 						dadosEnviar.nome = dados.nome;
@@ -98,19 +98,12 @@ angular.module('diariovirtual.controllers')
 							template: 'ERRO: ' + json.msg
 						});
 					}
-				})
-				.error(function(json, status, headers, config)
-				{
-					dados.email = '';
-					dados.nome = '';
-					dados.senha = '';
-					$ionicPopup.alert({
-						title: 'Erro!',
-						template: 'ERRO: Ocorreu um erro no cadastro, cheque sua conexão com a internet para continuar.'
-					});
 				});
 			} else
 			{
+				dados.email = '';
+				dados.nome = '';
+				dados.senha = '';
 				$ionicPopup.alert({
 					title: 'Erro!',
 					template: 'ERRO: Ocorreu um erro no cadastro, cheque sua conexão com a internet para continuar.'
@@ -167,46 +160,49 @@ angular.module('diariovirtual.controllers')
 			else
 				dadosEnviar.foto = "#";
 			
-			$ionicLoading.show({
-				template: '<ion-spinner icon="lines"></ion-spinner>&nbsp;Cadastrando...'
-			});
-		
-			$http.post( URL_DIARIO + 'registrar', dadosEnviar )
-			.success(function(json, status, headers, config)
+			if ( !$rootScope.offline )
 			{
-				$ionicLoading.hide();
-				if ( json.error == 0 )
+				$ionicLoading.show({
+					template: '<ion-spinner icon="lines"></ion-spinner>&nbsp;Cadastrando...'
+				});
+			
+				$http.post( URL_DIARIO + 'registrar', dadosEnviar )
+				.then(function(result)
 				{
-					localStorage.login = true;
-					window.usuario = {
-						nome: dadosEnviar.nome,
-						email: dadosEnviar.email,
-						foto: dadosEnviar.foto,
-						id: json.id,
-						facebook: false
-					};
-					localStorage.usuario = JSON.stringify( window.usuario );
-					$ionicPopup.alert({
-						title: 'Sucesso!',
-						template: json.msg
-					});
-					$location.path("/app/home");
-				} else
-				{
-					$ionicPopup.alert({
-						title: 'Erro!',
-						template: 'ERRO: ' + json.msg
-					});
-				}
-			})
-			.error(function(json, status, headers, config)
+					var json = result.data;
+					$ionicLoading.hide();
+					if ( json.error == 0 )
+					{
+						localStorage.login = true;
+						window.usuario = {
+							nome: dadosEnviar.nome,
+							email: dadosEnviar.email,
+							foto: dadosEnviar.foto,
+							id: json.id,
+							facebook: false
+						};
+						localStorage.usuario = JSON.stringify( window.usuario );
+						$ionicPopup.alert({
+							title: 'Sucesso!',
+							template: json.msg
+						});
+						$location.path("/app/home");
+					} else
+					{
+						$ionicPopup.alert({
+							title: 'Erro!',
+							template: 'ERRO: ' + json.msg
+						});
+					}
+				});
+			} else
 			{
 				$ionicLoading.hide();
 				$ionicPopup.alert({
 					title: 'Erro!',
 					template: 'ERRO: Ocorreu um erro no cadastro, cheque sua conexão com a internet para continuar.'
 				});
-			});
+			}
 		}
 	}
 )

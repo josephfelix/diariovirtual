@@ -17,11 +17,11 @@
     </ion-header-bar>
     <ion-content class="diario-menu" ng-controller="MenuCtrl">
       <ion-list>
-		<a class="item item-avatar diario-menu-item" href="#/app/perfil">
+		<div class="item item-avatar diario-menu-item" ng-click="verPerfil(usuario)">
 			<img ng-src="{{usuario.foto}}" error-src="img/anonimo.jpg" />
 			<p>Entrou como</p>
 			<h2>{{usuario.nome}}</h2>
-		</a>
+		</div>
         <ion-item nav-clear menu-close href="#/app/home" class="diario-menu-item">
 			<i class="ion-home diario-icon-menu"></i>&nbsp;In&iacute;cio
         </ion-item>
@@ -37,9 +37,6 @@
         <ion-item nav-clear menu-close href="#/app/solicitacoes" class="diario-menu-item">
 			<i class="ion-person-add diario-icon-menu"></i>&nbsp;Solicita&ccedil;&otilde;es
 		</ion-item>
-        <ion-item nav-clear menu-close href="#/app/procurar" class="diario-menu-item">
-			<i class="ion-search diario-icon-menu"></i>&nbsp;Procurar
-		</ion-item>
         <ion-item nav-clear menu-close href="#/app/amigos" class="diario-menu-item">
 			<i class="ion-person-stalker diario-icon-menu"></i>&nbsp;Amigos
 		</ion-item>
@@ -52,4 +49,24 @@
       </ion-list>
     </ion-content>
   </ion-side-menu>
+  
+	<ion-side-menu side="right">
+		<ion-header-bar class="bar diario-bar">
+		  <h1 class="title">Chat</h1>
+		</ion-header-bar>
+		<ion-content class="diario-menu" ng-controller="ChatCtrl">
+			<ion-list>
+				<a class="item item-avatar diario-menu-item chat-menu-item" ng-repeat="amigo in amigos" ng-click="chatWith(amigo)">
+					<img ng-src="{{URL_DIARIO + 'upload/' + amigo.usuario.foto}}" error-src="img/anonimo.jpg" />
+					<h2>{{amigo.usuario.nome}}</h2>
+					<p ng-show="amigo.online">Online</p>
+					<p ng-show="!amigo.online">Offline</p>
+					<span class="badge mt5" ng-class="{'badge-balanced':amigo.online, 'badge-assertive':!amigo.online}">&nbsp;&nbsp;</span>
+				</a>
+				<div class="item diario-menu-item chat-menu-item item-text-wrap" ng-show="!amigos.length" align="center">
+					Nenhum amigo encontrado.
+				</div>
+			</ion-list>
+		</ion-content>
+	</ion-side-menu>
 </ion-side-menus>

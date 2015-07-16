@@ -27,9 +27,8 @@
     <script src="js/constants.js"></script>
     <script src="js/app.js"></script>
     <script src="js/directives.js"></script>
-	<script type="text/javascript">
-		window.usuario = {};
-	</script>
+	<script src="lib/angular-elastic.js"></script>
+	<script src="lib/Autolinker.js"></script>
     <script src="js/controllers/LoginCtrl.js"></script>
     <script src="js/controllers/DiarioCtrl.js"></script>
     <script src="js/controllers/HomeCtrl.js"></script>
@@ -37,6 +36,13 @@
     <script src="js/controllers/CadastroCtrl.js"></script>
     <script src="js/controllers/MenuCtrl.js"></script>
     <script src="js/controllers/NotificacoesCtrl.js"></script>
+    <script src="js/controllers/ConfiguracoesCtrl.js"></script>
+    <script src="js/controllers/AmigosCtrl.js"></script>
+    <script src="js/controllers/SolicitacoesCtrl.js"></script>
+    <script src="js/controllers/MensagensCtrl.js"></script>
+    <script src="js/controllers/PerfilCtrl.js"></script>
+    <script src="js/controllers/ChatCtrl.js"></script>
+    <script src="js/controllers/ChatConversationCtrl.js"></script>
     <script src="js/controllers/AppCtrl.js"></script>
 
 
@@ -45,7 +51,26 @@
     
     </head>
 
-  <body ng-app="diariovirtual" ng-controller="AppCtrl">
-    <ion-nav-view></ion-nav-view>
-  </body>
+	<body ng-app="diariovirtual" ng-controller="AppCtrl">
+		<script id="abrir_foto.html" type="text/ng-template">
+			<div class="modal">
+				<header class="bar bar-header bar-energized">
+					<h1 class="title">Foto de {{nome_usuario}}</h1>
+					<div class="button button-clear" ng-click="closeModal()">
+						<span class="icon ion-close"></span>
+					</div>
+				</header>
+				<content has-header="true" padding="true">
+					<div align="center" class="mtop60">
+						<img ng-src="{{foto_atual}}" />
+					</div>
+				</content>
+			</div>
+			<!-- <div class="modal image-modal transparent" ng-click="closeModal()">
+				<ion-pane class="transparent">
+				</ion-pane>
+			</div> -->
+		</script>
+		<ion-nav-view></ion-nav-view>
+	</body>
 </html>

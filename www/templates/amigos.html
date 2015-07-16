@@ -1,5 +1,29 @@
 <ion-view view-title="<img src='img/logo.png' />">
-	<ion-content>
-		Home
+	<ion-nav-buttons side="right">
+		<button class="button button-icon button-clear ion-ios-chatbubble" menu-toggle="right"></button>
+	</ion-nav-buttons>
+	<ion-content ng-controller="AmigosCtrl">
+		<ion-refresher refreshing-icon="ion-loop" pulling-text="Puxe para atualizar" on-refresh="doRefresh()"></ion-refresher>
+		<div class="list card">
+			<div class="item item-divider">
+				<h2 align="center">
+					<strong>
+						Amigos
+					</strong>
+				</h2>
+			</div>
+			<div class="item item-avatar" ng-repeat="amigo in amigos">
+				<img ng-src="{{amigo.usuario.tipo == 'FACEBOOK' ? amigo.usuario.foto : URL_DIARIO + 'upload/' + amigo.usuario.foto}}" error-src="img/anonimo.jpg" />
+				<h2><strong>{{amigo.usuario.nome}}</strong></h2>
+
+				<p>Amigo desde {{amigo.data}}</p>
+				<button type="button" class="button button-assertive button-small" ng-click="unfriend(amigo)">
+					<i class="icon ion-close"></i>&nbsp;Desfazer amizade
+				</button>
+			</div>
+			<div class="item" align="center" ng-show="!amigos.length">
+				Voc&ecirc; n&atilde;o possui<br />amigos adicionados no momento.
+			</div>
+		</div>
 	</ion-content>
 </ion-view>

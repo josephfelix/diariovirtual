@@ -4,7 +4,7 @@
   <description>
 		Aplicativo do Diario Virtual
     </description>
-  <author email="joseph0xfff@gmail" href="http://josephfelix.github.io/">
+  <author email="joseph0xfff@gmail.com" href="http://josephfelix.github.io/">
       Joseph F.
     </author>
   <content src="index.html"/>
@@ -14,7 +14,7 @@
   <preference name="DisallowOverscroll" value="true"/>
   <preference name="BackupWebStorage" value="none"/>
   <preference name="SplashScreen" value="screen"/>
-  <preference name="SplashScreenDelay" value="3000"/>
+  <preference name="SplashScreenDelay" value="0"/>
   <feature name="StatusBar">
     <param name="ios-package" value="CDVStatusBar" onload="true"/>
   </feature>

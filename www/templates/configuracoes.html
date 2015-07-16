@@ -1,5 +1,49 @@
 <ion-view view-title="<img src='img/logo.png' />">
-	<ion-content>
-		Home
+	<ion-nav-buttons side="right">
+		<button class="button button-icon button-clear ion-ios-chatbubble" menu-toggle="right"></button>
+	</ion-nav-buttons>
+	<ion-content ng-controller="ConfiguracoesCtrl">
+		<div class="list list-inset">
+			<div class="item item-divider">
+				<h2 align="center">
+					<strong>
+						Configura&ccedil;&otilde;es
+					</strong>
+				</h2>
+			</div>
+			<label class="item item-input item-floating-label">
+				<span class="input-label"><strong>Nome</strong></span>
+				<input type="text" ng-model="config.nome" placeholder="Insira um nome" />
+			</label>
+			<div class="item" align="center">
+				<img ng-src="{{config.tipo == 'FACEBOOK' ? config.foto : URL_DIARIO + 'upload/' + config.foto}}" error-src="img/anonimo.jpg" /><br />
+				<button class="button button-energized button-block" type="button" ng-click="alterarFoto()" ng-show="config.tipo != 'FACEBOOK'">
+					<i class="icon ion-camera"></i>&nbsp;Selecionar foto
+				</button>
+			</div>
+			<div class="item item-divider" ng-show="config.tipo != 'FACEBOOK'">
+				<h2 align="center">
+					Alterar senha
+				</h2>
+			</div>
+			<div class="item item-input item-stacked-label" ng-show="config.tipo != 'FACEBOOK'">
+				<span class="input-label">Nova senha</span>
+				<input type="password" ng-model="config.senha" placeholder="****" />
+			</div>
+			<div class="item item-input item-stacked-label" ng-show="config.tipo != 'FACEBOOK'">
+				<span class="input-label">Repita a nova senha</span>
+				<input type="password" ng-model="config.senha2" placeholder="****" />
+			</div>
+			<div class="item" align="center">
+				<button class="button button-dark button-block" type="button" ng-click="salvarAlteracoes()">
+					<i class="icon ion-checkmark"></i>&nbsp;Salvar altera&ccedil;&otilde;es
+				</button>
+			</div>
+			<!-- <div class="item" align="center">
+				<button class="button button-assertive button-block" type="button" ng-click="excluirConta()">
+					<i class="icon ion-trash-a"></i>&nbsp;Excluir conta
+				</button>
+			</div> -->
+		</div>
 	</ion-content>
 </ion-view>

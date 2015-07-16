@@ -1,4 +1,7 @@
 <ion-view align-title="center" view-title="<img src='img/logo.png' />">
+	<ion-nav-buttons side="right">
+		<button class="button button-icon button-clear ion-ios-chatbubble" menu-toggle="right"></button>
+	</ion-nav-buttons>
 	<ion-content ng-controller="HomeCtrl" ng-init="init()">
 		<ion-refresher refreshing-icon="ion-loop" pulling-text="Puxe para atualizar" on-refresh="doRefresh()"></ion-refresher>
 		<div class="list card">
@@ -9,14 +12,14 @@
 
 				 <div class="list list-inset">
 					<div class="row" ng-repeat="foto in fotos track by $index" ng-if="$index % 3 === 0">
-						<div class="col col-33" ng-if="$index < fotos.length">
-							<img ng-src="{{fotos[$index]}}" width="100%" ng-click="remove($index)"/>
+						<div class="col" align="left">
+							<img ng-if="$index < fotos.length" ng-src="{{fotos[$index]}}" width="100%" ng-click="remove($index)"/>
 						</div>
-						<div class="col col-33" ng-if="$index + 1 < fotos.length">
-							<img ng-src="{{fotos[$index + 1]}}" width="100%" ng-click="remove($index + 1)"/>
+						<div class="col" align="left">
+							<img ng-if="$index + 1 < fotos.length" ng-src="{{fotos[$index + 1]}}" width="100%" ng-click="remove($index + 1)"/>
 						</div>
-						<div class="col col-33" ng-if="$index + 2 < fotos.length">
-							<img ng-src="{{fotos[$index + 2]}}" width="100%" ng-click="remove($index + 2)"/>
+						<div class="col" align="left">
+							<img ng-if="$index + 2 < fotos.length" ng-src="{{fotos[$index + 2]}}" width="100%" ng-click="remove($index + 2)"/>
 						</div>
 					</div>
 				</div>
@@ -47,7 +50,7 @@
       
 		<div class="list card" ng-repeat="post in posts">
 			<div class="item item-avatar">
-				<img ng-src="{{post.usuario.foto}}" error-src="img/anonimo.jpg" />
+				<img ng-src="{{post.usuario.tipo == 'FACEBOOK' ? post.usuario.foto : URL_DIARIO + 'upload/' + post.usuario.foto}}" error-src="img/anonimo.jpg" />
 				<h2>{{post.usuario.nome}}</h2>
 				<p>{{post.data}}&nbsp;
                     <i ng-if="post.publico == '0'" class="ion-locked"></i>
@@ -59,22 +62,20 @@
                     {{post.texto}}
 				</p>
                 <div class="list list-inset">
-                    <div class="row" ng-repeat="x in post.fotos track by $index" ng-if="$index % 3 === 0">
-                        <div class="col col-33" ng-if="$index < post.fotos.length">
-                            <img ng-src="{{post.fotos[$index]}}" width="100%"/>
-                        </div>
-                        <div class="col col-33" ng-if="$index + 1 < post.fotos.length">
-                            <img ng-src="{{post.fotos[$index + 1]}}" width="100%"/>
-                        </div>
-                        <div class="col col-33" ng-if="$index + 2 < post.fotos.length">
-                            <img ng-src="{{post.fotos[$index + 2]}}" width="100%"/>
+                    <div class="row" ng-show="post.fotos.length > 0">
+                        <div class="col" align="left" ng-repeat="foto in post.fotos">
+                            <img ng-src="{{URL_DIARIO + 'upload/' + foto}}" ng-click="openPhoto(foto)" class="max-width-100" />
                         </div>
                     </div>
                 </div>
+				<p>
+				  <a href="#" class="subdued">{{post.likes}} Curtida</a>
+				  <a href="#" class="subdued">{{post.comments}} Coment&aacute;rios</a>
+				</p>
             </div>
  
 			<div class="item tabs tabs-secondary tabs-icon-left diario-social-bar">
-				<a href="#" class="tab-item">
+				<a href="#" class="tab-item" ng-click="like(post)">
 					<i class="icon ion-thumbsup"></i>
 					Curtir
 				</a>
@@ -82,18 +83,24 @@
 					<i class="icon ion-chatbox"></i>
 					Comentar
 				</a>
-				<a class="tab-item" href="#">
+				<a class="tab-item" href="#" ng-click="share(post)">
 					<i class="icon ion-share"></i>
 					Compartilhar
 				</a>
 			</div>
 		</div>
 				
-		<div class="list card">
+		<div class="list card" ng-show="posts.length >= 20">
 			<div class="item">
-				<button type="button" class="button button-energized button-block button-large">
+				<button type="button" class="button button-energized button-block button-large" ng-click="carregarMais()">
 					<i class="ion-loop"></i>&nbsp;Carregar mais
 				</button>
+			</div>
+		</div>
+		
+		<div class="list card" ng-show="!posts.length">
+			<div class="item item-text-wrap" align="center">
+				Nenhuma postagem encontrada, aguarde e as publica&ccedil;&otilde;es de seus amigos aparecer&atilde;o aqui.
 			</div>
 		</div>
 	</ion-content>

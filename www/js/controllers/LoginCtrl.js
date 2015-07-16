@@ -41,8 +41,7 @@ angular.module('diariovirtual.controllers')
 			template: '<i class="ion-load-c ion-spin-animation"></i>&nbsp;Entrando...'
 		});
 		
-		var networkState = navigator.connection.type;
-		if ( networkState != Connection.NONE )
+		if ( !$rootScope.offline )
 		{			
 			$http.post( URL_DIARIO + 'login/?cache=' + Math.random(), 
 			{
@@ -58,8 +57,9 @@ angular.module('diariovirtual.controllers')
 					$rootScope.usuario = {
 						nome: json.nome,
 						email: json.email,
+						tipo: 'CADASTRO',
 						id: json.id,
-						foto: json.foto,
+						foto: URL_DIARIO + 'upload/' + json.foto,
 						facebook: false
 					};
 					localStorage.usuario = JSON.stringify( $rootScope.usuario );
@@ -89,43 +89,42 @@ angular.module('diariovirtual.controllers')
     
     $scope.loginFacebook = function()
 	{
-        $rootScope.friends = [];
-		try{
-        $cordovaFacebook.login(["email", "user_friends"], 
-		function(result)
+        $scope.friends = [];
+        $cordovaFacebook.login(["email", "user_friends"]) 
+		.then(function(result)
 		{
 			if ( result.status === 'connected' )
 			{
-                $cordovaFacebook.api("me/?fields=id,name,email,friends", ["user_friends"],
-				function(result)
+                $cordovaFacebook.api("me/?fields=id,name,email,friends", ["user_friends"])
+				.then(function(result)
 				{
-					alert(result.name);
 					$http.post( URL_DIARIO + 'login/facebook/?cache=' + Math.random(), 
 					{
 						nome: result.name,
 						email: result.email,
 						id: result.id
 					})
-					.success(function(json, status, headers, config)
+					.then( function( ret )
 					{
+						var json = ret.data;
 						localStorage.login = true;
 						$rootScope.usuario = {
 							nome: json.nome,
 							email: json.email,
+							tipo: 'FACEBOOK',
 							id: json.id,
-							foto: json.foto,
+							foto: 'http://graph.facebook.com/'+result.id+'/picture?fields=url&type=square',
 							facebook: true
 						};
 						localStorage.usuario = JSON.stringify( $rootScope.usuario );
-						$scope.friends = [];
-									   
+						
 						if ( json.firstlogin )
 						{
 							$scope.friends = result.friends.data;
 							if ( $scope.friends.length )
 							{
 								for ( var ind in $scope.friends )
-									$scope.friends[ind].src = "http://graph.facebook.com/" + $scope.friends[ind].id + "/picture?type=square";
+									$scope.friends[ind].src = "http://graph.facebook.com/" + $scope.friends[ind].id + "/picture?fields=url&type=square";
 								$location.path("/profile");
 							} else
 								$location.path("/app/home");
@@ -133,26 +132,23 @@ angular.module('diariovirtual.controllers')
 						{
 							$location.path("/app/home");
 						}
-					})
-					.error(function(json, status, headers, config)
-					{
-						$ionicLoading.hide();
-						$ionicPopup.alert({
-							title: 'Erro!',
-							template: 'ERRO: Ocorreu um erro no login, cheque sua conexao com a internet para continuar.'
-						});
 					});
 				}, 
 				function (error)
 				{
-					navigator.notification.alert ("Erro "+ error + " ao pegar dados do Facebook");
+					$ionicPopup.alert({
+						title: 'Erro!',
+						template: 'ERRO: Ocorreu um erro no login, cheque sua conexao com a internet para continuar.'
+					});
 				});
             }
 		},
 		function (error)
 		{
-			navigator.notification.alert ("Erro no login do Fabcebook " + JSON.stringify (error,null,4));
+			$ionicPopup.alert({
+				title: 'Erro!',
+				template: 'ERRO: Ocorreu um erro no login, cheque sua conexao com a internet para continuar.'
+			});
 		});
-		}catch(er){alert(er);}
     }
 })

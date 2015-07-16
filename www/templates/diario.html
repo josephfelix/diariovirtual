@@ -1,4 +1,7 @@
 <ion-view view-title="<img src='img/logo.png' />">
+	<ion-nav-buttons side="right">
+		<button class="button button-icon button-clear ion-ios-chatbubble" menu-toggle="right"></button>
+	</ion-nav-buttons>
 	<ion-content ng-controller="DiarioCtrl" ng-init="init()">
 		<ion-refresher refreshing-icon="ion-loop" pulling-text="Puxe para atualizar" on-refresh="doRefresh()"></ion-refresher>
 		<div class="list card">
@@ -34,13 +37,13 @@
 			</div>
 			<label class="item item-input">
 				<i class="icon ion-search placeholder-icon"></i>
-				<input type="text" placeholder="Procurar no meu di&aacute;rio">
+				<input type="text" placeholder="Procurar no meu di&aacute;rio" ng-model="searchText" />
 			</label>
 		</div>
 		
-		<div class="list card" ng-repeat="post in posts">
+		<div class="list card" ng-repeat="post in posts | filter:searchText">
 			<div class="item item-avatar">
-				<img ng-src="{{post.usuario.foto}}" error-src="img/anonimo.jpg" />
+				<img ng-src="{{post.usuario.tipo == 'FACEBOOK' ? post.usuario.foto : URL_DIARIO + 'upload/' + post.usuario.foto}}" error-src="img/anonimo.jpg" />
 				<h2>{{post.usuario.nome}}</h2>
 				<p>{{post.data}}&nbsp;
                     <i ng-if="post.publico == '0'" class="ion-locked"></i>
@@ -67,11 +70,17 @@
             </div>
 		</div>
 		
-		<div class="list card">
+		<div class="list card" ng-show="posts.length >= 20">
 			<div class="item">
-				<button type="button" class="button button-energized button-block button-large">
+				<button type="button" class="button button-energized button-block button-large" ng-click="carregarMais()">
 					<i class="ion-loop"></i>&nbsp;Carregar mais
 				</button>
+			</div>
+		</div>
+		
+		<div class="list card" ng-show="!posts.length">
+			<div class="item item-text-wrap" align="center">
+				Este aqui &eacute; seu di&aacute;rio, publique algo privado e aparecer&aacute; aqui.
 			</div>
 		</div>
 	</ion-content>

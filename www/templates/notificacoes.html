@@ -1,15 +1,31 @@
 <ion-view view-title="<img src='img/logo.png' />">
+	<ion-nav-buttons side="right">
+		<button class="button button-icon button-clear ion-ios-chatbubble" menu-toggle="right"></button>
+	</ion-nav-buttons>
 	<ion-content ng-controller="NotificacoesCtrl">
-		<ion-refresher refreshing-icon="ion-loop"></ion-refresher>
+		<ion-refresher refreshing-icon="ion-loop" on-refresh="doRefresh()" pulling-text="Puxe para atualizar"></ion-refresher>
 		<div class="list card">
+			<div class="item item-divider">
+				<h2 align="center">
+					<strong>
+						Notifica&ccedil;&otilde;es
+					</strong>
+				</h2>
+			</div>
+			
+			<div class="item item-icon-right" align="center" ng-hide="notifications.length > 0">
+				Nenhuma notifica&ccedil;&atilde;o.
+				<i class="icon ion-android-notifications-off"></i>
+			</div>
+			
 			<div class="item item-avatar item-icon-right" ng-repeat="notification in notifications">
-				<img ng-src="{{notification.usuario.foto}}" error-src="img/anonimo.jpg" />
+				<img ng-src="{{notification.usuario.tipo == 'FACEBOOK' ? notification.usuario.foto : URL_DIARIO + 'upload/' + notification.usuario.foto}}" error-src="img/anonimo.jpg" />
 				<h2><strong>{{notification.usuario.nome}}</strong></h2>
 				<p>{{notification.texto}}</p>
 				<i class="{{notification.icone}}" ng-show="notification.icone.length > 0"></i>
 			</div>
 			
-			<div class="item">
+			<div class="item" ng-show="notifications.length > 10">
 				<button type="button" class="button button-energized button-block button-large">
 					<i class="ion-loop"></i>&nbsp;Carregar mais
 				</button>

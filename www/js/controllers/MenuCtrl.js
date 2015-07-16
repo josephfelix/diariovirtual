@@ -1,7 +1,16 @@
 angular.module('diariovirtual.controllers')
-.controller('MenuCtrl', function( $scope, $ionicPopup, $rootScope, $location )
+.controller('MenuCtrl', function( $scope, $ionicPopup, $rootScope, $location, $state, $ionicSideMenuDelegate )
 {
-	try{
+	$scope.usuario = $rootScope.usuario;
+	if ( !$rootScope.usuario.facebook )
+		$scope.usuario.foto = URL_DIARIO + 'upload/' + $scope.usuario.foto;
+	$scope.URL_DIARIO = URL_DIARIO;
+	
+	$scope.verPerfil = function( usuario )
+	{
+		$state.go('app.perfil', {id: usuario.id});
+		$ionicSideMenuDelegate.toggleLeft();
+	}
 	$scope.logout = function()
 	{
 		$ionicPopup.confirm(
@@ -13,12 +22,10 @@ angular.module('diariovirtual.controllers')
 		{
 			if ( res )
 			{
-				localStorage.removeItem('login');
-				localStorage.removeItem('usuario');
+				localStorage.clear();
 				$rootScope.usuario = false;
 				$location.path('/login');
 			}
 		});
     }
-	}catch(er){alert(er);}
 });

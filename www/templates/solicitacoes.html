@@ -1,6 +1,9 @@
 <ion-view view-title="<img src='img/logo.png' />">
-	<ion-content>
-		<ion-refresher refreshing-icon="ion-loop"></ion-refresher>
+	<ion-nav-buttons side="right">
+		<button class="button button-icon button-clear ion-ios-chatbubble" menu-toggle="right"></button>
+	</ion-nav-buttons>
+	<ion-content ng-controller="SolicitacoesCtrl">
+		<ion-refresher refreshing-icon="ion-loop" pulling-text="Puxe para atualizar" on-refresh="doRefresh()"></ion-refresher>
 		<div class="list card">
 			<div class="item item-divider">
 				<h2 align="center">
@@ -9,27 +12,19 @@
 					</strong>
 				</h2>
 			</div>
-			<div class="item item-avatar item-button-right">
-				<img src="img/anonimo.jpg" />
-				<h2><strong>Joseph Felix</strong></h2>
-				<p>05:42 - 27/06/2015</p>
+			<div class="item item-avatar item-button-right" ng-repeat="solicitacao in pendentes">
+				<img ng-src="{{solicitacao.usuario.tipo == 'FACEBOOK' ? solicitacao.usuario.foto : URL_DIARIO + 'upload/' + solicitacao.usuario.foto}}" error-src="img/anonimo.jpg" />
+				<h2><strong>{{solicitacao.usuario.nome}}</strong></h2>
+				<p>{{solicitacao.data}}</p>
 				<div class="button-bar">
-					<a href="#" class="button button-energized icon ion-checkmark">
+					<a href="#" class="button button-energized icon ion-checkmark" ng-click="aceitar(solicitacao)">
 					</a>
-					<a href="#" class="button button-assertive icon ion-close">
+					<a href="#" class="button button-assertive icon ion-close" ng-click="rejeitar(solicitacao)">
 					</a>
 				</div>
 			</div>
-			<div class="item item-avatar item-button-right">
-				<img src="img/anonimo.jpg" />
-				<h2><strong>Joseph Felix</strong></h2>
-				<p>05:42 - 27/06/2015</p>
-				<div class="button-bar">
-					<a href="#" class="button button-energized icon ion-checkmark">
-					</a>
-					<a href="#" class="button button-assertive icon ion-close">
-					</a>
-				</div>
+			<div class="item" align="center" ng-show="!pendentes.length">
+				Nenhuma solicita&ccedil;&atilde;o<br />de amizade encontrada!
 			</div>
 		</div>
 	</ion-content>
