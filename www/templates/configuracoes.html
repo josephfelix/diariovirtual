@@ -16,7 +16,7 @@
 				<input type="text" ng-model="config.nome" placeholder="Insira um nome" />
 			</label>
 			<div class="item" align="center">
-				<img ng-src="{{config.tipo == 'FACEBOOK' ? config.foto : URL_DIARIO + 'upload/' + config.foto}}" error-src="img/anonimo.jpg" /><br />
+				<img ng-src="{{config.foto}}" error-src="img/anonimo.jpg" /><br />
 				<button class="button button-energized button-block" type="button" ng-click="alterarFoto()" ng-show="config.tipo != 'FACEBOOK'">
 					<i class="icon ion-camera"></i>&nbsp;Selecionar foto
 				</button>

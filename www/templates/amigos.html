@@ -13,7 +13,7 @@
 				</h2>
 			</div>
 			<div class="item item-avatar" ng-repeat="amigo in amigos">
-				<img ng-src="{{amigo.usuario.tipo == 'FACEBOOK' ? amigo.usuario.foto : URL_DIARIO + 'upload/' + amigo.usuario.foto}}" error-src="img/anonimo.jpg" />
+				<img ng-src="{{amigo.usuario.tipo == 'FACEBOOK' ? amigo.usuario.foto : URL_DIARIO + 'upload/' + amigo.usuario.foto}}" error-src="img/anonimo.jpg" ng-click="verPerfil(amigo.usuario.id)" />
 				<h2><strong>{{amigo.usuario.nome}}</strong></h2>
 
 				<p>Amigo desde {{amigo.data}}</p>

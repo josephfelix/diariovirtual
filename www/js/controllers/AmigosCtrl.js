@@ -8,7 +8,8 @@ angular.module('diariovirtual.controllers')
 		$rootScope, 
 		$timeout, 
 		$ionicPopup,
-		$ionicLoading
+		$ionicLoading,
+		$state
 	)
 {
 	$scope.amigos = [];
@@ -53,6 +54,11 @@ angular.module('diariovirtual.controllers')
 				});
 		   } 
 		});
+	}
+	
+	$scope.verPerfil = function( id )
+	{
+		$state.go('app.perfil', {id: id});
 	}
 	
 	$scope.doRefresh = function()

@@ -67,38 +67,74 @@ angular.module('diariovirtual.controllers')
 				return;
 			}
 			
-			
-			var imagem = $scope.fotos[0];
-			var options = new FileUploadOptions();
-			options.fileKey = "file";
-			options.fileName = imagem.substr(imagem.lastIndexOf('/')+1);
-			options.mimeType = "image/jpeg";
-			
-			var params = {};
-			params.publico = false;
-			params.texto = $scope.diariotexto;
-			params.iduser = $rootScope.usuario.id;
+			if ( $scope.fotos.length )
+			{
+				var imagem = $scope.fotos[0];
+				var options = new FileUploadOptions();
+				options.fileKey = "file";
+				options.fileName = imagem.substr(imagem.lastIndexOf('/')+1);
+				options.mimeType = "image/jpeg";
+				
+				var params = {};
+				params.publico = false;
+				params.texto = $scope.diariotexto;
+				params.iduser = $rootScope.usuario.id;
 
-			options.params = params;
-			
-			$ionicLoading.show({
-				template: '<i class="ion-load-c ion-spin-animation"></i>&nbsp;Publicando...'
-			});
+				options.params = params;
+				
+				$ionicLoading.show({
+					template: '<i class="ion-load-c ion-spin-animation"></i>&nbsp;Publicando...'
+				});
 
-			var ft = new FileTransfer();
-			ft.upload( 
-				imagem, 
-				encodeURI( URL_DIARIO + 'timeline/post/?cache=' + Math.random() ), 
-				function( result )
+				var ft = new FileTransfer();
+				ft.upload( 
+					imagem, 
+					encodeURI( URL_DIARIO + 'timeline/post/?cache=' + Math.random() ), 
+					function( result )
+					{
+						$ionicLoading.hide();
+						var json = JSON.parse( result.response );
+						if ( json.status == 'OK' )
+						{
+							$scope.posts.unshift(json);
+							$scope.diariotexto = "";
+							$scope.fotos = [];
+						} else
+						{
+							$ionicPopup.alert({
+								title: 'Erro',
+								template: 'Houve um erro ao publicar, cheque sua conex&atilde;o com a internet e tente novamente mais tarde.!'
+							});
+						}
+					}, 
+					function(e)
+					{
+						$ionicLoading.hide();
+						$ionicPopup.alert({
+							title: 'Erro',
+							template: 'Houve um erro ao publicar, cheque sua conex&atilde;o com a internet e tente novamente mais tarde.!'
+						});
+					}, options);
+			} else
+			{
+				$ionicLoading.show({
+					template: '<i class="ion-load-c ion-spin-animation"></i>&nbsp;Publicando...'
+				});
+				$http.post( URL_DIARIO + 'timeline/post/?cache=' + Math.random(),
+				{
+					publico: false,
+					texto: $scope.diariotexto,
+					iduser: $rootScope.usuario.id
+				})
+				.then(function(response)
 				{
 					$ionicLoading.hide();
-					var json = JSON.parse( result.response );
+					var json = response.data;
 					if ( json.status == 'OK' )
 					{
 						$scope.posts.unshift(json);
 						$scope.diariotexto = "";
-						$scope.fotos = []; 
-						$scope.$apply();
+						$scope.fotos = [];
 					} else
 					{
 						$ionicPopup.alert({
@@ -106,15 +142,22 @@ angular.module('diariovirtual.controllers')
 							template: 'Houve um erro ao publicar, cheque sua conex&atilde;o com a internet e tente novamente mais tarde.!'
 						});
 					}
-				}, 
-				function(e)
-				{
-					$ionicLoading.hide();
-					$ionicPopup.alert({
-						title: 'Erro',
-						template: 'Houve um erro ao publicar, cheque sua conex&atilde;o com a internet e tente novamente mais tarde.!'
-					});
-				}, options);
+				});
+			}
+		}
+		
+		$scope.openPhoto = function( filename )
+		{
+			$scope.nome_usuario = $rootScope.usuario.nome;
+			$scope.foto_atual = URL_DIARIO + 'upload/' + filename;
+			
+			$ionicModal.fromTemplateUrl('abrir_foto.html', {
+				scope: $scope,
+				animation: 'slide-in-up'
+			}).then(function(modal) {
+				$scope.modal = modal;
+				$scope.modal.show();
+			});
 		}
 		
 		$scope.doRefresh = function()
@@ -136,7 +179,7 @@ angular.module('diariovirtual.controllers')
 					$scope.posts = [];
 					for ( var ind in json )
 					{
-						$scope.posts.push( json[ind] );
+						$scope.posts.unshift( json[ind] );
 					}
 					localStorage.postsDiario = JSON.stringify( $scope.posts );
 					$scope.$apply();
@@ -218,7 +261,7 @@ angular.module('diariovirtual.controllers')
 						var json = result.data;
 						for ( var ind in json )
 						{
-							$scope.posts.push( json[ind] );
+							$scope.posts.unshift( json[ind] );
 						}
 						$scope.$apply();
 						localStorage.postsDiario = JSON.stringify( $scope.posts );

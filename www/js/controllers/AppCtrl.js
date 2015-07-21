@@ -20,8 +20,10 @@ angular.module('diariovirtual.controllers')
 	}
 	
 	$rootScope.offline = false;
+	$rootScope.$apply();
 	document.addEventListener("offline", function()
 	{
 		$rootScope.offline = true;
+		$rootScope.$apply();
 	}, false);
 })

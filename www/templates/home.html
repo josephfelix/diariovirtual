@@ -50,7 +50,7 @@
       
 		<div class="list card" ng-repeat="post in posts">
 			<div class="item item-avatar">
-				<img ng-src="{{post.usuario.tipo == 'FACEBOOK' ? post.usuario.foto : URL_DIARIO + 'upload/' + post.usuario.foto}}" error-src="img/anonimo.jpg" />
+				<img ng-src="{{post.usuario.tipo == 'FACEBOOK' ? post.usuario.foto : URL_DIARIO + 'upload/' + post.usuario.foto}}" error-src="img/anonimo.jpg" ng-click="verPerfil(post.usuario.id)" />
 				<h2>{{post.usuario.nome}}</h2>
 				<p>{{post.data}}&nbsp;
                     <i ng-if="post.publico == '0'" class="ion-locked"></i>
@@ -61,25 +61,25 @@
 				<p>
                     {{post.texto}}
 				</p>
-                <div class="list list-inset">
-                    <div class="row" ng-show="post.fotos.length > 0">
+                <div class="list list-inset" ng-show="post.fotos.length > 0">
+                    <div class="row">
                         <div class="col" align="left" ng-repeat="foto in post.fotos">
                             <img ng-src="{{URL_DIARIO + 'upload/' + foto}}" ng-click="openPhoto(foto)" class="max-width-100" />
                         </div>
                     </div>
                 </div>
-				<p>
+				<p ng-show="post.publico == '1'">
 				  <a href="#" class="subdued">{{post.likes}} Curtida</a>
 				  <a href="#" class="subdued">{{post.comments}} Coment&aacute;rios</a>
 				</p>
             </div>
  
-			<div class="item tabs tabs-secondary tabs-icon-left diario-social-bar">
+			<div class="item tabs tabs-secondary tabs-icon-left diario-social-bar" ng-show="post.publico == '1'">
 				<a href="#" class="tab-item" ng-click="like(post)">
 					<i class="icon ion-thumbsup"></i>
 					Curtir
 				</a>
-				<a class="tab-item" href="#">
+				<a class="tab-item" href="#" ng-click="comment(post)">
 					<i class="icon ion-chatbox"></i>
 					Comentar
 				</a>

@@ -1,0 +1,59 @@
+<ion-view view-title="<img src='img/logo.png' />">
+	<ion-nav-buttons side="right">
+		<button class="button button-icon button-clear ion-ios-chatbubble" menu-toggle="right"></button>
+	</ion-nav-buttons>
+	<ion-content ng-controller="CommentsCtrl">
+		<ion-refresher refreshing-icon="ion-loop" pulling-text="Puxe para atualizar" on-refresh="doRefresh()"></ion-refresher>		
+		<div class="list card">
+			<div class="item item-avatar">
+				<img ng-src="{{post.usuario.tipo == 'FACEBOOK' ? post.usuario.foto : URL_DIARIO + 'upload/' + post.usuario.foto}}" error-src="img/anonimo.jpg" ng-click="verPerfil(post.usuario.id)" />
+				<h2>{{post.usuario.nome}}</h2>
+				<p>{{post.data}}</p>
+			</div>
+
+			<div class="item item-body">
+				<p>
+                    {{post.texto}}
+				</p>
+                <div class="list list-inset" ng-show="post.fotos.length > 0">
+                    <div class="row">
+                        <div class="col" align="left" ng-repeat="foto in post.fotos">
+                            <img ng-src="{{URL_DIARIO + 'upload/' + foto}}" class="max-width-100" />
+                        </div>
+                    </div>
+                </div>
+				<p>
+				  <a href="#" class="subdued">{{post.likes}} Curtida</a>
+				  <a href="#" class="subdued">{{post.comments.total}} Coment&aacute;rios</a>
+				</p>
+            </div>
+			
+			<div class="item item-divider">
+				<h2 align="center">
+					<strong>
+						Coment&aacute;rios
+					</strong>
+				</h2>
+			</div>
+			<div class="item item-text-wrap" align="center" ng-show="!comments.length">
+				Nenhum coment&aacute;rio ainda foi feito para essa publica&ccedil;&atilde;o, seja o primeiro a comentar!
+			</div>
+			<div class="item item-text-wrap item-avatar" ng-class="{'item-icon-right':comment.usuario.id==post.usuario.id}" ng-repeat="comment in comments" ng-show="comments.length > 0">
+				<img ng-src="{{comment.usuario.tipo == 'FACEBOOK' ? comment.usuario.foto : URL_DIARIO + 'upload/' + comment.usuario.foto}}" error-src="img/anonimo.jpg" ng-click="verPerfil(comment.usuario.id)" />
+				<h2>{{comment.usuario.nome}}</h2>
+				<p>{{comment.data}}</p>
+				{{comment.comentario}}
+				<i class="icon ion-close" ng-show="comment.usuario.id==post.usuario.id" ng-click="apagarComentario(comment)"></i>
+			</div>
+			<div class="item item-avatar item-icon-right">
+				<img ng-src="{{usuario.foto}}" error-src="img/anonimo.jpg" />
+				<label class="item-input-wrapper chat-item-input">
+					<textarea class="diario-campo-comentario" ng-model="comentario" value="" required minlength="1" maxlength="1500"></textarea>
+				</label>
+				<button class="button button-icon icon ion-android-send footer-btn" type="button"
+					ng-disabled="!comentario || comentario === ''" ng-click="enviarComentario(comentario)">
+				</button>
+			</div>
+		</div>
+	</ion-content>
+</ion-view>

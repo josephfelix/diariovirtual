@@ -31,7 +31,7 @@
 						</button>
 					</div>
 					<div class="col">
-						<button class="button button-energized pull-right" type="button">Publicar</button>
+						<button class="button button-energized pull-right" ng-click="publish()" type="button">Publicar</button>
 					</div>
 				</div>
 			</div>
@@ -54,16 +54,10 @@
 				<p>
                     {{post.texto}}
 				</p>
-                <div class="list list-inset">
-                    <div class="row" ng-repeat="x in post.fotos track by $index" ng-if="$index % 3 === 0">
-                        <div class="col col-33" ng-if="$index < post.fotos.length">
-                            <img ng-src="{{post.fotos[$index]}}" width="100%"/>
-                        </div>
-                        <div class="col col-33" ng-if="$index + 1 < post.fotos.length">
-                            <img ng-src="{{post.fotos[$index + 1]}}" width="100%"/>
-                        </div>
-                        <div class="col col-33" ng-if="$index + 2 < post.fotos.length">
-                            <img ng-src="{{post.fotos[$index + 2]}}" width="100%"/>
+                <div class="list list-inset" ng-show="post.fotos.length > 0">
+                    <div class="row">
+                        <div class="col" align="left" ng-repeat="foto in post.fotos">
+                            <img ng-src="{{URL_DIARIO + 'upload/' + foto}}" ng-click="openPhoto(foto)" class="max-width-100" />
                         </div>
                     </div>
                 </div>

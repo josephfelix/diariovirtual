@@ -11,7 +11,8 @@ angular.module('diariovirtual.controllers')
 		$ionicModal,
 		$ionicLoading,
 		$timeout,
-		$cordovaSocialSharing
+		$cordovaSocialSharing,
+		$state
 	)
 {
 	try
@@ -19,6 +20,8 @@ angular.module('diariovirtual.controllers')
 		$scope.posts = [];
 		if ( localStorage.hasOwnProperty('postsTimeline') )
 			$scope.posts = JSON.parse( localStorage.postsTimeline );
+		else
+			localStorage.postsTimeline = '[]';
 		
 		$scope.diariopublico = true;
 		$scope.diariotexto = "";
@@ -47,6 +50,11 @@ angular.module('diariovirtual.controllers')
 			}
 		}
 		
+		$scope.comment = function( post )
+		{
+			$state.go('app.comment', {id: post.idatt});
+		}
+		
 		$scope.publish = function()
 		{
 			if ( !$scope.diariotexto.length && !$scope.fotos.length )
@@ -59,37 +67,76 @@ angular.module('diariovirtual.controllers')
 			}
 			
 			
-			var imagem = $scope.fotos[0];
-			var options = new FileUploadOptions();
-			options.fileKey = "file";
-			options.fileName = imagem.substr(imagem.lastIndexOf('/')+1);
-			options.mimeType = "image/jpeg";
-			
-			var params = {};
-			params.publico = $scope.diariopublico;
-			params.texto = $scope.diariotexto;
-			params.iduser = $rootScope.usuario.id;
+			if ( $scope.fotos.length )
+			{
+				var imagem = $scope.fotos[0];
+				var options = new FileUploadOptions();
+				options.fileKey = "file";
+				options.fileName = imagem.substr(imagem.lastIndexOf('/')+1);
+				options.mimeType = "image/jpeg";
+				
+				var params = {};
+				params.publico = $scope.diariopublico;
+				params.texto = $scope.diariotexto;
+				params.iduser = $rootScope.usuario.id;
 
-			options.params = params;
-			
-			$ionicLoading.show({
-				template: '<i class="ion-load-c ion-spin-animation"></i>&nbsp;Publicando...'
-			});
+				options.params = params;
+				
+				$ionicLoading.show({
+					template: '<i class="ion-load-c ion-spin-animation"></i>&nbsp;Publicando...'
+				});
 
-			var ft = new FileTransfer();
-			ft.upload( 
-				imagem, 
-				encodeURI( URL_DIARIO + 'timeline/post/?cache=' + Math.random() ), 
-				function( result )
+				var ft = new FileTransfer();
+				ft.upload( 
+					imagem, 
+					encodeURI( URL_DIARIO + 'timeline/post/?cache=' + Math.random() ), 
+					function( result )
+					{
+						$ionicLoading.hide();
+						var json = JSON.parse( result.response );
+						if ( json.status == 'OK' )
+						{
+							$scope.posts.unshift(json);
+							$scope.diariotexto = "";
+							$scope.fotos = [];
+							localStorage.postsTimeline = '[]';
+						} else
+						{
+							$ionicPopup.alert({
+								title: 'Erro',
+								template: 'Houve um erro ao publicar, cheque sua conex&atilde;o com a internet e tente novamente mais tarde.!'
+							});
+						}
+					}, 
+					function(e)
+					{
+						$ionicLoading.hide();
+						$ionicPopup.alert({
+							title: 'Erro',
+							template: 'Houve um erro ao publicar, cheque sua conex&atilde;o com a internet e tente novamente mais tarde.!'
+						});
+					}, options);
+			} else
+			{
+				$ionicLoading.show({
+					template: '<i class="ion-load-c ion-spin-animation"></i>&nbsp;Publicando...'
+				});
+				$http.post( URL_DIARIO + 'timeline/post/?cache=' + Math.random(),
+				{
+					publico: $scope.diariopublico,
+					texto: $scope.diariotexto,
+					iduser: $rootScope.usuario.id
+				})
+				.then(function(response)
 				{
 					$ionicLoading.hide();
-					var json = JSON.parse( result.response );
+					var json = response.data;
 					if ( json.status == 'OK' )
 					{
 						$scope.posts.unshift(json);
 						$scope.diariotexto = "";
-						$scope.fotos = []; 
-						$scope.$apply();
+						$scope.fotos = [];
+						localStorage.postsTimeline = '[]';
 					} else
 					{
 						$ionicPopup.alert({
@@ -97,15 +144,8 @@ angular.module('diariovirtual.controllers')
 							template: 'Houve um erro ao publicar, cheque sua conex&atilde;o com a internet e tente novamente mais tarde.!'
 						});
 					}
-				}, 
-				function(e)
-				{
-					$ionicLoading.hide();
-					$ionicPopup.alert({
-						title: 'Erro',
-						template: 'Houve um erro ao publicar, cheque sua conex&atilde;o com a internet e tente novamente mais tarde.!'
-					});
-				}, options);
+				});
+			}
 		}
 		
 		$scope.like = function( post )
@@ -211,14 +251,14 @@ angular.module('diariovirtual.controllers')
 					$ionicLoading.hide();
 					var json = result.data;
 					$scope.posts = [];
+					$scope.$apply();
 					if ( json.length )
 					{
 						for ( var ind in json )
 						{
-							$scope.posts.push( json[ind] );
+							$scope.posts.unshift( json[ind] );
 						}
 					}
-					$scope.$apply();
 					localStorage.postsTimeline = JSON.stringify( $scope.posts );
 					$scope.$broadcast('scroll.refreshComplete');
 				});
@@ -283,6 +323,11 @@ angular.module('diariovirtual.controllers')
 			});
 		}
 		
+		$scope.verPerfil = function( id )
+		{
+			$state.go('app.perfil', {id: id});
+		}
+		
 		$scope.openPhoto = function( filename )
 		{
 			$scope.nome_usuario = $rootScope.usuario.nome;
@@ -303,7 +348,7 @@ angular.module('diariovirtual.controllers')
 			$scope.foto_atual = '';
 		}
 		
-		if ( !localStorage.postsTimeline )
+		if ( localStorage.postsTimeline == '[]' )
 		{
 			if ( !$rootScope.offline )
 			{
@@ -323,7 +368,7 @@ angular.module('diariovirtual.controllers')
 						{
 							for ( var ind in json )
 							{
-								$scope.posts.push( json[ind] );
+								$scope.posts.unshift( json[ind] );
 							}
 						}
 						$scope.$apply();

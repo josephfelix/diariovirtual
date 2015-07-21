@@ -317,11 +317,11 @@ img.profile-pic.right {
   right: 10px;
 }
 
-.ion-email {
+/* .ion-email {
   float: right;
   font-size: 32px;
   vertical-align: middle;
-}
+} */
 
 .message {
   font-size: 14px;
@@ -476,4 +476,16 @@ a.autolinker {
 
 .message-footer {
 	height: 44px !important;
+}
+
+hr.hr-diario {
+	border-bottom: solid 1px #fff;
+	border-top: solid 1px #ddd;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.diario-campo-comentario {
+	height: 40px;
+	padding-top: 6px;
 }

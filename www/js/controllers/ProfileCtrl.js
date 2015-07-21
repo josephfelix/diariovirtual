@@ -9,30 +9,22 @@ angular.module('diariovirtual.controllers')
 		$ionicPopup,
 		$ionicLoading
 	)
-{        
-    $scope.init = function() {
-        $scope.amigosselecionados = [];
-    };
+{
+    var amigosSelecionados = [];
     
     $scope.adicionarAmigo = function( friend )
 	{
 		alert( JSON.stringify( friend ) );
-        //$scope.amigosselecionados.push( friend );
-    };
+        amigosSelecionados.push( friend );
+    }
     
-    $scope.envia = function () {
-        $scope.arg = {};
+    $scope.envia = function()
+	{
+		alert(amigosSelecionados.length + " amigos selecionados");
+        /* $scope.arg = {};
         $scope.arg.func = "AMIGOSFB";
         $scope.arg.conta = $scope.username;
         $scope.arg.amigos = $scope.amigosselecionados;
-        var ret = sendserver ( $scope.arg );
-
-        $location.path ("/app/home");
-    };       
-
-    function sendserver (args) {
-        navigator.notification.alert (JSON.stringify(args, null, 4));
-        return true;
+        $location.path ("/app/home"); */
     }
-
-})
+});

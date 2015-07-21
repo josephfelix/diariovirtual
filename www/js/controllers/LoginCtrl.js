@@ -62,6 +62,7 @@ angular.module('diariovirtual.controllers')
 						foto: URL_DIARIO + 'upload/' + json.foto,
 						facebook: false
 					};
+					$rootScope.$apply();
 					localStorage.usuario = JSON.stringify( $rootScope.usuario );
 					localStorage.login = true;
 					$location.path("/app/home");
@@ -116,6 +117,7 @@ angular.module('diariovirtual.controllers')
 							foto: 'http://graph.facebook.com/'+result.id+'/picture?fields=url&type=square',
 							facebook: true
 						};
+						$rootScope.$apply();
 						localStorage.usuario = JSON.stringify( $rootScope.usuario );
 						
 						if ( json.firstlogin )

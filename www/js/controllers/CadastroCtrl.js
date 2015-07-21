@@ -8,9 +8,12 @@ angular.module('diariovirtual.controllers')
 		$ionicActionSheet, 
 		$ionicPopup, 
 		$rootScope,
-		$ionicLoading
+		$ionicLoading,
+		$cordovaCamera
 	)
 	{
+		$scope.escolheufoto = false;
+		$scope.fotoUsuario = '#';
 		var exclude = /[^@\-\.\w]|^[_@\.\-]|[\._\-]{2}|[@\.]{2}|(@)[^@]*\1/;
 		var check = /@[\w\-]+\./;
 		var checkend = /\.[a-zA-Z]{2,3}$/;
@@ -20,12 +23,11 @@ angular.module('diariovirtual.controllers')
 			if ( localStorage.hasOwnProperty("login") === true )
 			{
 				$rootScope.usuario = JSON.parse( localStorage.usuario );
+				$rootScope.$apply();
 				$location.path("/app/home");
 				return;
 			}
 		}
-		
-		$scope.fotoUsuario = '#';
 		
 		$scope.cadastrar = function( dados )
 		{
@@ -71,7 +73,7 @@ angular.module('diariovirtual.controllers')
 			{
 				$ionicPopup.alert({
 					title: 'Erro!',
-					template: 'ERRO: E-mail inválido, insira um e-mail no formato exemplo@diariovirtual.com.br'
+					template: 'ERRO: E-mail inválido, insira um e-mail no formato exemplo@gmail.com'
 				});   
 				return;
 			}
@@ -118,35 +120,35 @@ angular.module('diariovirtual.controllers')
 				Camera.PictureSourceType.PHOTOLIBRARY
 			];
 		
-			var hideSheet = $ionicActionSheet.show(
+			var options = {
+				'androidTheme': window.plugins.actionsheet.ANDROID_THEMES.THEME_HOLO_LIGHT,
+				'title': 'Selecione a origem da foto',
+				'buttonLabels': ['Tirar foto agora (Câmera)', 'Buscar da galeria'],
+				'androidEnableCancelButton' : true,
+				'winphoneEnableCancelButton' : true,
+				'addCancelButtonWithLabel': 'Cancelar',
+				'position': [20, 40]
+			};
+			
+			window.plugins.actionsheet.show(options, function( opc )
 			{
-				buttons: [
-					{ text: '<i class="icon ion-camera"></i>&nbsp;Tirar foto' },
-					{ text: '<i class="icon ion-images"></i>&nbsp;Selecionar da galeria' }
-				],
-				titleText: 'Selecione a origem da foto',
-				cancelText: 'Cancelar',
-				buttonClicked: function(index)
+				if ( opc != 3 )
 				{
-					navigator.camera.getPicture(function(imageData)
-					{
-						$scope.fotoUsuario = imageData;
-						$scope.escolheufoto = true;
-					}, function()
-					{
-						$ionicPopup.alert({
-							title: 'Erro!',
-							template: 'ERRO: Ocorreu um erro ao selecionar sua foto, tente novamente.'
-						});
-					},
+					$cordovaCamera.getPicture(
 					{ 
-						quality: 50, 
-						destinationType: Camera.DestinationType.DATA_URL, 
-						sourceType: fonte[index],
+						quality: 100, 
+						destinationType: Camera.DestinationType.FILE_URI, 
+						allowEdit: true,
+						encodingType: 0, 
+						sourceType: fonte[opc-1],
 						mediaType: Camera.MediaType.PICTURE,
 						correctOrientation: true,
 						targetWidth: 175,
 						targetHeight: 175
+					}).then(function(imageData)
+					{
+						$scope.fotoUsuario = imageData;
+						$scope.escolheufoto = true;
 					}); 
 					return true;
 				}
@@ -155,17 +157,79 @@ angular.module('diariovirtual.controllers')
 
 		$scope.completarCadastro = function()
 		{
-			if ( $scope.escolheufoto )
-				dadosEnviar.foto = $scope.fotoUsuario;
-			else
-				dadosEnviar.foto = "#";
+			if ( $rootScope.offline )
+			{
+				$ionicPopup.alert({
+					title: 'Erro!',
+					template: 'ERRO: Ocorreu um erro no cadastro, cheque sua conexão com a internet para continuar.'
+				});
+				return;
+			}
 			
-			if ( !$rootScope.offline )
+			if ( $scope.escolheufoto )
 			{
 				$ionicLoading.show({
-					template: '<ion-spinner icon="lines"></ion-spinner>&nbsp;Cadastrando...'
+					template: '<i class="ion-load-c"></i>&nbsp;Cadastrando...'
+				});
+				var imagem = $scope.fotoUsuario;
+				var options = new FileUploadOptions();
+				options.fileKey = "file";
+				options.fileName = imagem.substr(imagem.lastIndexOf('/')+1);
+				options.mimeType = "image/jpeg";
+				options.params = dadosEnviar;
+				
+				var ft = new FileTransfer();
+				ft.upload( 
+					imagem, 
+					encodeURI( URL_DIARIO + 'registrar/?cache=' + Math.random() ), 
+					function( result )
+					{
+						var json = JSON.parse( result.response );
+						$ionicLoading.hide();
+						if ( json.error == 0 )
+						{
+							$rootScope.usuario = {
+								nome: dadosEnviar.nome,
+								email: dadosEnviar.email,
+								tipo: 'CADASTRO',
+								id: json.id,
+								foto: URL_DIARIO + 'upload/' + json.foto,
+								facebook: false
+							};
+							$rootScope.$apply();
+							localStorage.usuario = JSON.stringify( $rootScope.usuario );
+							localStorage.login = true;
+							$ionicPopup.alert({
+								title: 'Sucesso!',
+								template: json.msg
+							})
+							.then(function()
+							{
+								$location.path("/app/home");
+							});
+						} else
+						{
+							$ionicPopup.alert({
+								title: 'Erro!',
+								template: 'ERRO: ' + json.msg
+							});
+						}
+					}, 
+					function(e)
+					{
+						$ionicLoading.hide();
+						$ionicPopup.alert({
+							title: 'Erro!',
+							template: 'ERRO: Ocorreu um erro no cadastro, cheque sua conexão com a internet para continuar.'
+						});
+					}, options);
+			} else
+			{
+				$ionicLoading.show({
+					template: '<i class="ion-load-c"></i>&nbsp;Cadastrando...'
 				});
 			
+				dadosEnviar.foto = '#';
 				$http.post( URL_DIARIO + 'registrar', dadosEnviar )
 				.then(function(result)
 				{
@@ -173,15 +237,17 @@ angular.module('diariovirtual.controllers')
 					$ionicLoading.hide();
 					if ( json.error == 0 )
 					{
-						localStorage.login = true;
-						window.usuario = {
+						$rootScope.usuario = {
 							nome: dadosEnviar.nome,
 							email: dadosEnviar.email,
-							foto: dadosEnviar.foto,
+							tipo: 'CADASTRO',
 							id: json.id,
+							foto: '#',
 							facebook: false
 						};
-						localStorage.usuario = JSON.stringify( window.usuario );
+						$rootScope.$apply();
+						localStorage.login = true;
+						localStorage.usuario = JSON.stringify( $rootScope.usuario );
 						$ionicPopup.alert({
 							title: 'Sucesso!',
 							template: json.msg
@@ -194,13 +260,6 @@ angular.module('diariovirtual.controllers')
 							template: 'ERRO: ' + json.msg
 						});
 					}
-				});
-			} else
-			{
-				$ionicLoading.hide();
-				$ionicPopup.alert({
-					title: 'Erro!',
-					template: 'ERRO: Ocorreu um erro no cadastro, cheque sua conexão com a internet para continuar.'
 				});
 			}
 		}

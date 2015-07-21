@@ -2,8 +2,6 @@ angular.module('diariovirtual.controllers')
 .controller('MenuCtrl', function( $scope, $ionicPopup, $rootScope, $location, $state, $ionicSideMenuDelegate )
 {
 	$scope.usuario = $rootScope.usuario;
-	if ( !$rootScope.usuario.facebook )
-		$scope.usuario.foto = URL_DIARIO + 'upload/' + $scope.usuario.foto;
 	$scope.URL_DIARIO = URL_DIARIO;
 	
 	$scope.verPerfil = function( usuario )
@@ -24,6 +22,7 @@ angular.module('diariovirtual.controllers')
 			{
 				localStorage.clear();
 				$rootScope.usuario = false;
+				$rootScope.$apply();
 				$location.path('/login');
 			}
 		});

@@ -114,6 +114,15 @@ angular.module('diariovirtual', [
 		}
 	})
 	
+	.state('app.comment', {
+		url: "/comment/:id",
+		views: {
+		  'menuContent': {
+			templateUrl: "templates/comment.html"
+		  }
+		}
+	})
+	
 	.state('app.chat', {
 		url: "/chat/:id",
 		views: {
